@@ -1,49 +1,58 @@
 package dev.zhafran.velnyx.feature.auth.presentation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
-import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.zhafran.velnyx.feature.auth.data.AuthState
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
-    onNavigateToGetStarted: () -> Unit = {},
+    onUnauthenticated: () -> Unit,
+    onAuthenticated: () -> Unit,
+    viewModel: AuthViewModel = hiltViewModel(),
 ) {
-    LaunchedEffect(Unit) {
-        delay(1_500L)
-        onNavigateToGetStarted()
+    val authState by viewModel.authState.collectAsStateWithLifecycle()
+
+    // Wait at least 500ms so splash doesn't flash, then navigate based on auth state
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthState.Authenticated -> {
+                delay(500L)
+                onAuthenticated()
+            }
+            is AuthState.Unauthenticated -> {
+                delay(500L)
+                onUnauthenticated()
+            }
+            is AuthState.Loading -> {
+                // Wait for auth state to resolve
+            }
+        }
     }
 
+    // Simple centered splash visual — real splash design comes later
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(VelnyxSpacing.lg),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
         ) {
-            Text("SplashScreen", style = MaterialTheme.typography.headlineLarge)
-            Text("(placeholder)", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = "VELNYX",
+                style = MaterialTheme.typography.displayMedium,
+            )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SplashScreenPreview() {
-    VelnyxTheme { SplashScreen() }
 }

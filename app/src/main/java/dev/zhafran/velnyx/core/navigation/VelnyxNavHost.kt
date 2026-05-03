@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import dev.zhafran.velnyx.feature.auth.presentation.ConfirmEmailScreen
 import dev.zhafran.velnyx.feature.auth.presentation.GetStartedScreen
 import dev.zhafran.velnyx.feature.auth.presentation.LoginScreen
 import dev.zhafran.velnyx.feature.auth.presentation.ProfileSetupScreen
@@ -30,8 +31,13 @@ fun VelnyxNavHost(navController: NavHostController) {
         // ── Auth ─────────────────────────────────────────────────────────────
         composable<SplashRoute> {
             SplashScreen(
-                onNavigateToGetStarted = {
+                onUnauthenticated = {
                     navController.navigate(GetStartedRoute) {
+                        popUpTo(SplashRoute) { inclusive = true }
+                    }
+                },
+                onAuthenticated = {
+                    navController.navigate(HomeRoute) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }
                 },
@@ -47,25 +53,51 @@ fun VelnyxNavHost(navController: NavHostController) {
 
         composable<LoginRoute> {
             LoginScreen(
-                onNavigateToHome = {
+                onNavigateToSignUp = { navController.navigate(SignUpRoute) },
+                onNavigateBack = { navController.popBackStack() },
+                onLoginSuccess = {
                     navController.navigate(HomeRoute) {
                         popUpTo(GetStartedRoute) { inclusive = true }
                     }
                 },
-                onNavigateBack = { navController.popBackStack() },
             )
         }
 
         composable<SignUpRoute> {
             SignUpScreen(
-                onNavigateToProfileSetup = { navController.navigate(ProfileSetupRoute) },
+                onNavigateToLogin = {
+                    navController.popBackStack()
+                    navController.navigate(LoginRoute)
+                },
                 onNavigateBack = { navController.popBackStack() },
+                onSignUpSuccess = {
+                    navController.navigate(ProfileSetupRoute) {
+                        popUpTo(GetStartedRoute) { inclusive = true }
+                    }
+                },
+                onConfirmEmailRequired = {
+                    navController.navigate(ConfirmEmailRoute(email = it)) {
+                        popUpTo(SignUpRoute) { inclusive = true }
+                    }
+                },
             )
         }
 
         composable<ProfileSetupRoute> {
             ProfileSetupScreen(
                 onNavigateToPermissions = { navController.navigate(PermissionsRoute) },
+            )
+        }
+
+        composable<ConfirmEmailRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<ConfirmEmailRoute>()
+            ConfirmEmailScreen(
+                email = route.email,
+                onNavigateBack = {
+                    navController.navigate(LoginRoute) {
+                        popUpTo(GetStartedRoute)
+                    }
+                },
             )
         }
 

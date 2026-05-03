@@ -18,6 +18,9 @@ data object SignUpRoute
 @Serializable
 data object ProfileSetupRoute
 
+@Serializable
+data class ConfirmEmailRoute(val email: String)
+
 // ── Onboarding ───────────────────────────────────────────────────────────────
 @Serializable
 data object PermissionsRoute

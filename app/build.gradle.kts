@@ -26,9 +26,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "SUPABASE_URL", "\"${localProps["supabase_url"] ?: ""}\"")
-        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${localProps["supabase_anon_key"] ?: ""}\"")
-        buildConfigField("String", "MAPTILER_API_KEY", "\"${localProps["MAPTILER_API_KEY"] ?: ""}\"")
+        buildConfigField("String", "SUPABASE_URL", "\"${localProps["supabase.url"] ?: ""}\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${localProps["supabase.anon"] ?: ""}\"")
+        buildConfigField("String", "MAPTILER_API_KEY", "\"${localProps["maptiler.key"] ?: ""}\"")
     }
 
     buildTypes {

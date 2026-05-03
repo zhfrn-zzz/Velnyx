@@ -1,4 +1,4 @@
-package dev.zhafran.velnyx.feature.home.presentation
+package dev.zhafran.velnyx.feature.tracking.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,17 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import dev.zhafran.velnyx.core.designsystem.component.VelnyxPrimaryButton
-import dev.zhafran.velnyx.core.designsystem.component.VelnyxSecondaryButton
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
 
 @Composable
-fun HomeScreen(
-    onNavigateToCountdown: () -> Unit = {},
-    onNavigateToHistory: () -> Unit = {},
-    onNavigateToPrograms: () -> Unit = {},
-    onNavigateToClubs: () -> Unit = {},
-    onNavigateToSettings: () -> Unit = {},
+fun LiveTrackingScreen(
+    onNavigateToRunSummary: (String) -> Unit = {},
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -37,24 +32,19 @@ fun HomeScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text("HomeScreen", style = MaterialTheme.typography.headlineLarge)
+            Text("LiveTrackingScreen", style = MaterialTheme.typography.headlineLarge)
             Text("(placeholder)", style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(VelnyxSpacing.xl))
-            VelnyxPrimaryButton(text = "Start Run", onClick = onNavigateToCountdown)
-            Spacer(modifier = Modifier.height(VelnyxSpacing.md))
-            VelnyxSecondaryButton(text = "History", onClick = onNavigateToHistory)
-            Spacer(modifier = Modifier.height(VelnyxSpacing.md))
-            VelnyxSecondaryButton(text = "Programs", onClick = onNavigateToPrograms)
-            Spacer(modifier = Modifier.height(VelnyxSpacing.md))
-            VelnyxSecondaryButton(text = "Clubs", onClick = onNavigateToClubs)
-            Spacer(modifier = Modifier.height(VelnyxSpacing.md))
-            VelnyxSecondaryButton(text = "Settings", onClick = onNavigateToSettings)
+            VelnyxPrimaryButton(
+                text = "Finish",
+                onClick = { onNavigateToRunSummary("demo-run-id") },
+            )
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun HomeScreenPreview() {
-    VelnyxTheme { HomeScreen() }
+fun LiveTrackingScreenPreview() {
+    VelnyxTheme { LiveTrackingScreen() }
 }

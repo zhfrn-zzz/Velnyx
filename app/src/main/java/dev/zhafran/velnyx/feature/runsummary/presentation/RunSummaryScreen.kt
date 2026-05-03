@@ -1,4 +1,4 @@
-package dev.zhafran.velnyx.feature.home.presentation
+package dev.zhafran.velnyx.feature.runsummary.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,17 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import dev.zhafran.velnyx.core.designsystem.component.VelnyxPrimaryButton
-import dev.zhafran.velnyx.core.designsystem.component.VelnyxSecondaryButton
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
 
 @Composable
-fun HomeScreen(
-    onNavigateToCountdown: () -> Unit = {},
-    onNavigateToHistory: () -> Unit = {},
-    onNavigateToPrograms: () -> Unit = {},
-    onNavigateToClubs: () -> Unit = {},
-    onNavigateToSettings: () -> Unit = {},
+fun RunSummaryScreen(
+    runId: String = "",
+    onNavigateToHome: () -> Unit = {},
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -37,24 +33,17 @@ fun HomeScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text("HomeScreen", style = MaterialTheme.typography.headlineLarge)
+            Text("RunSummaryScreen", style = MaterialTheme.typography.headlineLarge)
             Text("(placeholder)", style = MaterialTheme.typography.bodyMedium)
+            Text("Run ID: $runId", style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.height(VelnyxSpacing.xl))
-            VelnyxPrimaryButton(text = "Start Run", onClick = onNavigateToCountdown)
-            Spacer(modifier = Modifier.height(VelnyxSpacing.md))
-            VelnyxSecondaryButton(text = "History", onClick = onNavigateToHistory)
-            Spacer(modifier = Modifier.height(VelnyxSpacing.md))
-            VelnyxSecondaryButton(text = "Programs", onClick = onNavigateToPrograms)
-            Spacer(modifier = Modifier.height(VelnyxSpacing.md))
-            VelnyxSecondaryButton(text = "Clubs", onClick = onNavigateToClubs)
-            Spacer(modifier = Modifier.height(VelnyxSpacing.md))
-            VelnyxSecondaryButton(text = "Settings", onClick = onNavigateToSettings)
+            VelnyxPrimaryButton(text = "Done", onClick = onNavigateToHome)
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun HomeScreenPreview() {
-    VelnyxTheme { HomeScreen() }
+fun RunSummaryScreenPreview() {
+    VelnyxTheme { RunSummaryScreen(runId = "demo-run-id") }
 }

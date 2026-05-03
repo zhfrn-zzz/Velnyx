@@ -1,4 +1,4 @@
-package dev.zhafran.velnyx.feature.home.presentation
+package dev.zhafran.velnyx.feature.auth.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,12 +19,9 @@ import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
 
 @Composable
-fun HomeScreen(
-    onNavigateToCountdown: () -> Unit = {},
-    onNavigateToHistory: () -> Unit = {},
-    onNavigateToPrograms: () -> Unit = {},
-    onNavigateToClubs: () -> Unit = {},
-    onNavigateToSettings: () -> Unit = {},
+fun SignUpScreen(
+    onNavigateToProfileSetup: () -> Unit = {},
+    onNavigateBack: () -> Unit = {},
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -37,24 +34,18 @@ fun HomeScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text("HomeScreen", style = MaterialTheme.typography.headlineLarge)
+            Text("SignUpScreen", style = MaterialTheme.typography.headlineLarge)
             Text("(placeholder)", style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(VelnyxSpacing.xl))
-            VelnyxPrimaryButton(text = "Start Run", onClick = onNavigateToCountdown)
+            VelnyxPrimaryButton(text = "Continue", onClick = onNavigateToProfileSetup)
             Spacer(modifier = Modifier.height(VelnyxSpacing.md))
-            VelnyxSecondaryButton(text = "History", onClick = onNavigateToHistory)
-            Spacer(modifier = Modifier.height(VelnyxSpacing.md))
-            VelnyxSecondaryButton(text = "Programs", onClick = onNavigateToPrograms)
-            Spacer(modifier = Modifier.height(VelnyxSpacing.md))
-            VelnyxSecondaryButton(text = "Clubs", onClick = onNavigateToClubs)
-            Spacer(modifier = Modifier.height(VelnyxSpacing.md))
-            VelnyxSecondaryButton(text = "Settings", onClick = onNavigateToSettings)
+            VelnyxSecondaryButton(text = "Back", onClick = onNavigateBack)
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun HomeScreenPreview() {
-    VelnyxTheme { HomeScreen() }
+fun SignUpScreenPreview() {
+    VelnyxTheme { SignUpScreen() }
 }

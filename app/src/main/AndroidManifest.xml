@@ -43,6 +43,12 @@
             android:foregroundServiceType="location"
             android:exported="false" />
 
+        <!-- M2 Run Tracking foreground service -->
+        <service
+            android:name=".core.location.RunTrackingService"
+            android:foregroundServiceType="location"
+            android:exported="false" />
+
     </application>
 
 </manifest>

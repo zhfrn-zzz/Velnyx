@@ -12,35 +12,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import dev.zhafran.velnyx.feature.auth.data.AuthState
-import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
-    onUnauthenticated: () -> Unit,
-    onAuthenticated: () -> Unit,
-    viewModel: AuthViewModel = hiltViewModel(),
+    onGoToGetStarted: () -> Unit,
+    onGoToProfileSetup: () -> Unit,
+    onGoToHome: () -> Unit,
+    viewModel: SplashViewModel = hiltViewModel(),
 ) {
-    val authState by viewModel.authState.collectAsStateWithLifecycle()
+    val splashState by viewModel.splashState.collectAsStateWithLifecycle()
 
-    // Wait at least 500ms so splash doesn't flash, then navigate based on auth state
-    LaunchedEffect(authState) {
-        when (authState) {
-            is AuthState.Authenticated -> {
-                delay(500L)
-                onAuthenticated()
-            }
-            is AuthState.Unauthenticated -> {
-                delay(500L)
-                onUnauthenticated()
-            }
-            is AuthState.Loading -> {
-                // Wait for auth state to resolve
-            }
+    LaunchedEffect(splashState) {
+        when (splashState) {
+            SplashState.GoToGetStarted -> onGoToGetStarted()
+            SplashState.GoToProfileSetup -> onGoToProfileSetup()
+            SplashState.GoToHome -> onGoToHome()
+            SplashState.Loading -> {}
         }
     }
 
-    // Simple centered splash visual — real splash design comes later
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background,

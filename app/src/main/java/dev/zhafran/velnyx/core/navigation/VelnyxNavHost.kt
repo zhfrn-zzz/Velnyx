@@ -8,14 +8,19 @@ import androidx.navigation.toRoute
 import dev.zhafran.velnyx.feature.auth.presentation.ConfirmEmailScreen
 import dev.zhafran.velnyx.feature.auth.presentation.GetStartedScreen
 import dev.zhafran.velnyx.feature.auth.presentation.LoginScreen
-import dev.zhafran.velnyx.feature.auth.presentation.ProfileSetupScreen
 import dev.zhafran.velnyx.feature.auth.presentation.SignUpScreen
 import dev.zhafran.velnyx.feature.auth.presentation.SplashScreen
+import dev.zhafran.velnyx.feature.profile.presentation.ProfileSetupScreen
 import dev.zhafran.velnyx.feature.clubs.presentation.ClubsScreen
 import dev.zhafran.velnyx.feature.history.presentation.HistoryDetailScreen
 import dev.zhafran.velnyx.feature.history.presentation.HistoryListScreen
 import dev.zhafran.velnyx.feature.home.presentation.HomeScreen
-import dev.zhafran.velnyx.feature.onboarding.presentation.PermissionsScreen
+import dev.zhafran.velnyx.feature.onboarding.presentation.PermissionAutostartScreen
+import dev.zhafran.velnyx.feature.onboarding.presentation.PermissionBackgroundScreen
+import dev.zhafran.velnyx.feature.onboarding.presentation.PermissionBatteryScreen
+import dev.zhafran.velnyx.feature.onboarding.presentation.PermissionLocationScreen
+import dev.zhafran.velnyx.feature.onboarding.presentation.PermissionNotificationsScreen
+import dev.zhafran.velnyx.core.util.PermissionHelper
 import dev.zhafran.velnyx.feature.profile.presentation.SettingsScreen
 import dev.zhafran.velnyx.feature.programs.presentation.ProgramsScreen
 import dev.zhafran.velnyx.feature.runsummary.presentation.RunSummaryScreen
@@ -31,12 +36,17 @@ fun VelnyxNavHost(navController: NavHostController) {
         // ── Auth ─────────────────────────────────────────────────────────────
         composable<SplashRoute> {
             SplashScreen(
-                onUnauthenticated = {
+                onGoToGetStarted = {
                     navController.navigate(GetStartedRoute) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }
                 },
-                onAuthenticated = {
+                onGoToProfileSetup = {
+                    navController.navigate(ProfileSetupRoute) {
+                        popUpTo(SplashRoute) { inclusive = true }
+                    }
+                },
+                onGoToHome = {
                     navController.navigate(HomeRoute) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }
@@ -85,7 +95,11 @@ fun VelnyxNavHost(navController: NavHostController) {
 
         composable<ProfileSetupRoute> {
             ProfileSetupScreen(
-                onNavigateToPermissions = { navController.navigate(PermissionsRoute) },
+                onProfileSaved = {
+                    navController.navigate(PermissionNotificationsRoute) {
+                        popUpTo(SplashRoute) { inclusive = true }
+                    }
+                },
             )
         }
 
@@ -101,10 +115,61 @@ fun VelnyxNavHost(navController: NavHostController) {
             )
         }
 
-        // ── Onboarding ───────────────────────────────────────────────────────
-        composable<PermissionsRoute> {
-            PermissionsScreen(
-                onNavigateToHome = {
+        // ── Onboarding (permission wizard) ──────────────────────────────────
+        composable<PermissionNotificationsRoute> {
+            PermissionNotificationsScreen(
+                onContinue = {
+                    navController.navigate(PermissionLocationRoute) {
+                        popUpTo(PermissionNotificationsRoute) { inclusive = true }
+                    }
+                },
+                onSkipAll = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo(SplashRoute) { inclusive = true }
+                    }
+                },
+            )
+        }
+
+        composable<PermissionLocationRoute> {
+            PermissionLocationScreen(
+                onContinue = {
+                    navController.navigate(PermissionBackgroundRoute) {
+                        popUpTo(PermissionLocationRoute) { inclusive = true }
+                    }
+                },
+            )
+        }
+
+        composable<PermissionBackgroundRoute> {
+            PermissionBackgroundScreen(
+                onContinue = {
+                    navController.navigate(PermissionBatteryRoute) {
+                        popUpTo(PermissionBackgroundRoute) { inclusive = true }
+                    }
+                },
+            )
+        }
+
+        composable<PermissionBatteryRoute> {
+            PermissionBatteryScreen(
+                onContinue = {
+                    if (PermissionHelper.isTranssionOEM()) {
+                        navController.navigate(PermissionAutostartRoute) {
+                            popUpTo(PermissionBatteryRoute) { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate(HomeRoute) {
+                            popUpTo(SplashRoute) { inclusive = true }
+                        }
+                    }
+                },
+            )
+        }
+
+        composable<PermissionAutostartRoute> {
+            PermissionAutostartScreen(
+                onContinue = {
                     navController.navigate(HomeRoute) {
                         popUpTo(SplashRoute) { inclusive = true }
                     }

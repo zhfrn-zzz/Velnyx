@@ -21,9 +21,21 @@ data object ProfileSetupRoute
 @Serializable
 data class ConfirmEmailRoute(val email: String)
 
-// ── Onboarding ───────────────────────────────────────────────────────────────
+// ── Onboarding (permission wizard steps) ────────────────────────────────────
 @Serializable
-data object PermissionsRoute
+data object PermissionNotificationsRoute
+
+@Serializable
+data object PermissionLocationRoute
+
+@Serializable
+data object PermissionBackgroundRoute
+
+@Serializable
+data object PermissionBatteryRoute
+
+@Serializable
+data object PermissionAutostartRoute
 
 // ── Home ─────────────────────────────────────────────────────────────────────
 @Serializable

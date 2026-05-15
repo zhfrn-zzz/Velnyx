@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Pause
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.zhafran.velnyx.core.designsystem.component.VelnyxMapView
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxBlack
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxError
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray400
@@ -140,20 +142,20 @@ fun LiveTrackingScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Map placeholder
-        Box(
+        // Map
+        VelnyxMapView(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(240.dp)
                 .padding(horizontal = 16.dp)
-                .background(
-                    MaterialTheme.colorScheme.surface,
-                    MaterialTheme.shapes.medium,
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text("Map loading...", color = VelnyxGray400)
-        }
+                .clip(RoundedCornerShape(16.dp)),
+            currentLatLng = stats.lastLatLng,
+            routePoints = when (state) {
+                is RunState.Running -> state.routePoints
+                is RunState.Paused -> state.routePoints
+                else -> emptyList()
+            },
+        )
 
         Spacer(modifier = Modifier.weight(1f))
 

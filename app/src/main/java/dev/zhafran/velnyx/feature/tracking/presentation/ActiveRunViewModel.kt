@@ -9,6 +9,7 @@ import dev.zhafran.velnyx.core.location.RunTrackingService
 import dev.zhafran.velnyx.core.util.MetCalculator
 import dev.zhafran.velnyx.feature.profile.data.ProfileRepository
 import dev.zhafran.velnyx.feature.tracking.data.ActiveRunRepository
+import org.maplibre.android.geometry.LatLng
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,6 +25,7 @@ data class RunStats(
     val avgPaceSecondsPerKm: Int = 0,
     val calories: Int = 0,
     val lastAccuracyM: Float = 99f,
+    val lastLatLng: LatLng? = null,
 )
 
 data class RunSummary(
@@ -36,8 +38,8 @@ data class RunSummary(
 sealed interface RunState {
     data object Idle : RunState
     data class Countdown(val secLeft: Int) : RunState
-    data class Running(val stats: RunStats) : RunState
-    data class Paused(val stats: RunStats) : RunState
+    data class Running(val stats: RunStats, val routePoints: List<LatLng> = emptyList()) : RunState
+    data class Paused(val stats: RunStats, val routePoints: List<LatLng> = emptyList()) : RunState
     data class Finishing(val stats: RunStats) : RunState
     data class Finished(val summary: RunSummary) : RunState
 }
@@ -124,18 +126,25 @@ class ActiveRunViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
 
-        // Observe latest point for accuracy
+        // Observe points for accuracy + route
         if (runId > 0) {
             repository.observePoints(runId)
                 .onEach { points ->
                     val lastAccuracy = points.lastOrNull()?.accuracy ?: 99f
+                    val lastPoint = points.lastOrNull()?.let { LatLng(it.lat, it.lon) }
+                    val route = points.map { LatLng(it.lat, it.lon) }
                     val current = _state.value
-                    val updated = when (current) {
-                        is RunState.Running -> current.copy(stats = current.stats.copy(lastAccuracyM = lastAccuracy))
-                        is RunState.Paused -> current.copy(stats = current.stats.copy(lastAccuracyM = lastAccuracy))
+                    _state.value = when (current) {
+                        is RunState.Running -> current.copy(
+                            stats = current.stats.copy(lastAccuracyM = lastAccuracy, lastLatLng = lastPoint),
+                            routePoints = route,
+                        )
+                        is RunState.Paused -> current.copy(
+                            stats = current.stats.copy(lastAccuracyM = lastAccuracy, lastLatLng = lastPoint),
+                            routePoints = route,
+                        )
                         else -> current
                     }
-                    _state.value = updated
                 }
                 .launchIn(viewModelScope)
         }

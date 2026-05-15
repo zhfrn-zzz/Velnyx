@@ -229,8 +229,17 @@ fun VelnyxNavHost(navController: NavHostController) {
                 BackHandler(enabled = true) { /* no-op — must use finish button */ }
 
                 LaunchedEffect(runState) {
-                    if (runState is RunState.Finished) {
-                        navController.navigate(RunSummaryRoute(runId = "latest")) {
+                    val current = runState
+                    if (current is RunState.Finished) {
+                        val s = current.summary
+                        navController.navigate(
+                            RunSummaryRoute(
+                                distanceM = s.distanceM,
+                                durationMs = s.durationMs,
+                                avgPace = s.avgPaceSecondsPerKm,
+                                calories = s.calories,
+                            )
+                        ) {
                             popUpTo(HomeRoute)
                         }
                     }
@@ -248,7 +257,10 @@ fun VelnyxNavHost(navController: NavHostController) {
         composable<RunSummaryRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<RunSummaryRoute>()
             RunSummaryScreen(
-                runId = route.runId,
+                distanceM = route.distanceM,
+                durationMs = route.durationMs,
+                avgPace = route.avgPace,
+                calories = route.calories,
                 onNavigateToHome = {
                     navController.navigate(HomeRoute) {
                         popUpTo(HomeRoute) { inclusive = true }

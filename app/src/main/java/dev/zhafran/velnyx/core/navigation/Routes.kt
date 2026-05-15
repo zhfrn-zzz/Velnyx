@@ -52,7 +52,12 @@ data object CountdownRoute
 data object LiveTrackingRoute
 
 @Serializable
-data class RunSummaryRoute(val runId: String)
+data class RunSummaryRoute(
+    val distanceM: Int = 0,
+    val durationMs: Long = 0L,
+    val avgPace: Int = 0,
+    val calories: Int = 0,
+)
 
 // ── History ──────────────────────────────────────────────────────────────────
 @Serializable

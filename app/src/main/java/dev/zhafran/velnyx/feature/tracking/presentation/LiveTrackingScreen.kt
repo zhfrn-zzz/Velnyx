@@ -145,9 +145,9 @@ fun LiveTrackingScreen(
         // Map
         VelnyxMapView(
             modifier = Modifier
+                .padding(horizontal = 16.dp)
                 .fillMaxWidth()
                 .height(240.dp)
-                .padding(horizontal = 16.dp)
                 .clip(RoundedCornerShape(16.dp)),
             currentLatLng = stats.lastLatLng,
             routePoints = when (state) {

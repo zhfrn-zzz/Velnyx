@@ -10,6 +10,7 @@ import dev.zhafran.velnyx.core.util.MetCalculator
 import dev.zhafran.velnyx.feature.profile.data.ProfileRepository
 import dev.zhafran.velnyx.feature.tracking.data.ActiveRunRepository
 import org.maplibre.android.geometry.LatLng
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -56,6 +57,7 @@ class ActiveRunViewModel @Inject constructor(
 
     private var runId: Long = -1L
     private var weightKg: Float = 70f
+    private var displayTimerJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -67,7 +69,7 @@ class ActiveRunViewModel @Inject constructor(
     fun onStartTapped() {
         if (_state.value !is RunState.Idle) return
         viewModelScope.launch {
-            for (i in 3 downTo 0) {
+            for (i in 3 downTo 1) {
                 _state.value = RunState.Countdown(i)
                 delay(1000)
             }
@@ -97,6 +99,7 @@ class ActiveRunViewModel @Inject constructor(
     fun onFinishTapped() {
         val current = _state.value
         if (current !is RunState.Running && current !is RunState.Paused) return
+        stopDisplayTimer()
         viewModelScope.launch {
             val stats = currentStats()
             _state.value = RunState.Finishing(stats)
@@ -119,9 +122,15 @@ class ActiveRunViewModel @Inject constructor(
             .onEach { entity ->
                 if (entity == null || entity.state == "FINISHED") return@onEach
                 val stats = buildStats(entity)
-                _state.value = when (entity.state) {
-                    "PAUSED" -> RunState.Paused(stats)
-                    else -> RunState.Running(stats)
+                when (entity.state) {
+                    "PAUSED" -> {
+                        stopDisplayTimer()
+                        _state.value = RunState.Paused(stats)
+                    }
+                    else -> {
+                        _state.value = RunState.Running(stats)
+                        startDisplayTimer()
+                    }
                 }
             }
             .launchIn(viewModelScope)
@@ -148,6 +157,28 @@ class ActiveRunViewModel @Inject constructor(
                 }
                 .launchIn(viewModelScope)
         }
+    }
+
+    private fun startDisplayTimer() {
+        if (displayTimerJob?.isActive == true) return
+        displayTimerJob = viewModelScope.launch {
+            while (true) {
+                delay(1000)
+                val entity = repository.observeActiveRun().first() ?: continue
+                if (entity.state != "RUNNING") break
+                val now = System.currentTimeMillis()
+                val durationMs = (now - entity.startedAt - entity.totalPausedMs).coerceAtLeast(0)
+                val current = _state.value
+                if (current is RunState.Running) {
+                    _state.value = current.copy(stats = current.stats.copy(durationMs = durationMs))
+                }
+            }
+        }
+    }
+
+    private fun stopDisplayTimer() {
+        displayTimerJob?.cancel()
+        displayTimerJob = null
     }
 
     private fun buildStats(entity: ActiveRunEntity): RunStats {

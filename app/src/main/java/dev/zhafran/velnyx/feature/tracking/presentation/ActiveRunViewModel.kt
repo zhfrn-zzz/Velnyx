@@ -6,10 +6,13 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.zhafran.velnyx.core.data.db.ActiveRunEntity
 import dev.zhafran.velnyx.core.location.RunTrackingService
+import dev.zhafran.velnyx.core.util.MetCalculator
+import dev.zhafran.velnyx.feature.profile.data.ProfileRepository
 import dev.zhafran.velnyx.feature.tracking.data.ActiveRunRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -17,14 +20,16 @@ import javax.inject.Inject
 
 data class RunStats(
     val distanceM: Int = 0,
-    val durationS: Int = 0,
-    val avgPaceSPerKm: Int = 0,
+    val durationMs: Long = 0L,
+    val avgPaceSecondsPerKm: Int = 0,
+    val calories: Int = 0,
+    val lastAccuracyM: Float = 99f,
 )
 
 data class RunSummary(
     val distanceM: Int = 0,
-    val durationS: Int = 0,
-    val avgPaceSPerKm: Int = 0,
+    val durationMs: Long = 0L,
+    val avgPaceSecondsPerKm: Int = 0,
     val calories: Int = 0,
 )
 
@@ -41,17 +46,26 @@ sealed interface RunState {
 class ActiveRunViewModel @Inject constructor(
     private val app: Application,
     private val repository: ActiveRunRepository,
+    private val profileRepository: ProfileRepository,
 ) : AndroidViewModel(app) {
 
     private val _state = MutableStateFlow<RunState>(RunState.Idle)
     val state: StateFlow<RunState> = _state
 
     private var runId: Long = -1L
+    private var weightKg: Float = 70f
+
+    init {
+        viewModelScope.launch {
+            val profile = profileRepository.getProfileOnce().getOrNull()
+            if (profile != null) weightKg = profile.weightKg.toFloat()
+        }
+    }
 
     fun onStartTapped() {
         if (_state.value !is RunState.Idle) return
         viewModelScope.launch {
-            for (i in 3 downTo 1) {
+            for (i in 3 downTo 0) {
                 _state.value = RunState.Countdown(i)
                 delay(1000)
             }
@@ -82,61 +96,76 @@ class ActiveRunViewModel @Inject constructor(
         val current = _state.value
         if (current !is RunState.Running && current !is RunState.Paused) return
         viewModelScope.launch {
-            val stats = statsFromEntity(null) // will use last known
+            val stats = currentStats()
             _state.value = RunState.Finishing(stats)
             repository.finish(runId)
             app.startService(RunTrackingService.stopIntent(app))
-            // Re-read final state from Room
-            // Small delay to let Room write complete
             delay(100)
             _state.value = RunState.Finished(
                 RunSummary(
                     distanceM = stats.distanceM,
-                    durationS = stats.durationS,
-                    avgPaceSPerKm = stats.avgPaceSPerKm,
-                    calories = 0,
+                    durationMs = stats.durationMs,
+                    avgPaceSecondsPerKm = stats.avgPaceSecondsPerKm,
+                    calories = stats.calories,
                 )
             )
         }
     }
 
-    /**
-     * Observes Room for the active run entity. Duration is derived purely
-     * from persisted fields: (now - startedAt - totalPausedMs).
-     * No in-memory timer — fully crash-safe.
-     */
     private fun observeRun() {
         repository.observeActiveRun()
             .onEach { entity ->
                 if (entity == null || entity.state == "FINISHED") return@onEach
-                val stats = statsFromEntity(entity)
+                val stats = buildStats(entity)
                 _state.value = when (entity.state) {
                     "PAUSED" -> RunState.Paused(stats)
                     else -> RunState.Running(stats)
                 }
             }
             .launchIn(viewModelScope)
+
+        // Observe latest point for accuracy
+        if (runId > 0) {
+            repository.observePoints(runId)
+                .onEach { points ->
+                    val lastAccuracy = points.lastOrNull()?.accuracy ?: 99f
+                    val current = _state.value
+                    val updated = when (current) {
+                        is RunState.Running -> current.copy(stats = current.stats.copy(lastAccuracyM = lastAccuracy))
+                        is RunState.Paused -> current.copy(stats = current.stats.copy(lastAccuracyM = lastAccuracy))
+                        else -> current
+                    }
+                    _state.value = updated
+                }
+                .launchIn(viewModelScope)
+        }
     }
 
-    private fun statsFromEntity(entity: ActiveRunEntity?): RunStats {
-        if (entity == null) {
-            val current = _state.value
-            return when (current) {
-                is RunState.Running -> current.stats
-                is RunState.Paused -> current.stats
-                is RunState.Finishing -> current.stats
-                else -> RunStats()
-            }
-        }
+    private fun buildStats(entity: ActiveRunEntity): RunStats {
         val now = System.currentTimeMillis()
         val pausedMs = if (entity.pausedSince != null) {
             entity.totalPausedMs + (now - entity.pausedSince)
         } else {
             entity.totalPausedMs
         }
-        val durationS = ((now - entity.startedAt - pausedMs) / 1000).toInt().coerceAtLeast(0)
+        val durationMs = (now - entity.startedAt - pausedMs).coerceAtLeast(0)
         val distanceM = entity.distanceM
-        val pace = if (distanceM >= 10) (durationS * 1000) / distanceM else 0
-        return RunStats(distanceM = distanceM, durationS = durationS, avgPaceSPerKm = pace)
+        val pace = if (distanceM >= 10) ((durationMs / 1000).toInt() * 1000) / distanceM else 0
+        val durationHours = durationMs / 3_600_000f
+        val calories = MetCalculator.calculate(pace, weightKg, durationHours)
+        return RunStats(
+            distanceM = distanceM,
+            durationMs = durationMs,
+            avgPaceSecondsPerKm = pace,
+            calories = calories,
+            lastAccuracyM = currentStats().lastAccuracyM,
+        )
+    }
+
+    private fun currentStats(): RunStats = when (val s = _state.value) {
+        is RunState.Running -> s.stats
+        is RunState.Paused -> s.stats
+        is RunState.Finishing -> s.stats
+        else -> RunStats()
     }
 }

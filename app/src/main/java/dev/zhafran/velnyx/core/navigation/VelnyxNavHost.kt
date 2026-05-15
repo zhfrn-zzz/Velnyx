@@ -1,9 +1,15 @@
 package dev.zhafran.velnyx.core.navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
 import dev.zhafran.velnyx.feature.auth.presentation.ConfirmEmailScreen
 import dev.zhafran.velnyx.feature.auth.presentation.GetStartedScreen
@@ -24,8 +30,10 @@ import dev.zhafran.velnyx.core.util.PermissionHelper
 import dev.zhafran.velnyx.feature.profile.presentation.SettingsScreen
 import dev.zhafran.velnyx.feature.programs.presentation.ProgramsScreen
 import dev.zhafran.velnyx.feature.runsummary.presentation.RunSummaryScreen
+import dev.zhafran.velnyx.feature.tracking.presentation.ActiveRunViewModel
 import dev.zhafran.velnyx.feature.tracking.presentation.CountdownScreen
 import dev.zhafran.velnyx.feature.tracking.presentation.LiveTrackingScreen
+import dev.zhafran.velnyx.feature.tracking.presentation.RunState
 
 @Composable
 fun VelnyxNavHost(navController: NavHostController) {
@@ -180,7 +188,9 @@ fun VelnyxNavHost(navController: NavHostController) {
         // ── Home ─────────────────────────────────────────────────────────────
         composable<HomeRoute> {
             HomeScreen(
-                onNavigateToCountdown = { navController.navigate(CountdownRoute) },
+                onNavigateToCountdown = {
+                    navController.navigate(TrackingGraphRoute)
+                },
                 onNavigateToHistory = { navController.navigate(HistoryListRoute) },
                 onNavigateToPrograms = { navController.navigate(ProgramsRoute) },
                 onNavigateToClubs = { navController.navigate(ClubsRoute) },
@@ -188,25 +198,51 @@ fun VelnyxNavHost(navController: NavHostController) {
             )
         }
 
-        // ── Tracking ─────────────────────────────────────────────────────────
-        composable<CountdownRoute> {
-            CountdownScreen(
-                onNavigateToLiveTracking = {
-                    navController.navigate(LiveTrackingRoute) {
-                        popUpTo(CountdownRoute) { inclusive = true }
-                    }
-                },
-            )
-        }
+        // ── Tracking (nested graph — shared ViewModel) ──────────────────────
+        navigation<TrackingGraphRoute>(startDestination = CountdownRoute) {
+            composable<CountdownRoute> { backStackEntry ->
+                val parentEntry = navController.getBackStackEntry(TrackingGraphRoute)
+                val viewModel: ActiveRunViewModel = hiltViewModel(parentEntry)
+                val runState by viewModel.state.collectAsStateWithLifecycle()
 
-        composable<LiveTrackingRoute> {
-            LiveTrackingScreen(
-                onNavigateToRunSummary = { runId ->
-                    navController.navigate(RunSummaryRoute(runId = runId)) {
-                        popUpTo(HomeRoute)
+                LaunchedEffect(Unit) { viewModel.onStartTapped() }
+
+                LaunchedEffect(runState) {
+                    if (runState is RunState.Running) {
+                        navController.navigate(LiveTrackingRoute) {
+                            popUpTo(CountdownRoute) { inclusive = true }
+                        }
                     }
-                },
-            )
+                }
+
+                when (val s = runState) {
+                    is RunState.Countdown -> CountdownScreen(secLeft = s.secLeft)
+                    else -> CountdownScreen(secLeft = 3)
+                }
+            }
+
+            composable<LiveTrackingRoute> { backStackEntry ->
+                val parentEntry = navController.getBackStackEntry(TrackingGraphRoute)
+                val viewModel: ActiveRunViewModel = hiltViewModel(parentEntry)
+                val runState by viewModel.state.collectAsStateWithLifecycle()
+
+                BackHandler(enabled = true) { /* no-op — must use finish button */ }
+
+                LaunchedEffect(runState) {
+                    if (runState is RunState.Finished) {
+                        navController.navigate(RunSummaryRoute(runId = "latest")) {
+                            popUpTo(HomeRoute)
+                        }
+                    }
+                }
+
+                LiveTrackingScreen(
+                    state = runState,
+                    onPause = viewModel::onPauseTapped,
+                    onResume = viewModel::onResumeTapped,
+                    onFinish = viewModel::onFinishTapped,
+                )
+            }
         }
 
         composable<RunSummaryRoute> { backStackEntry ->

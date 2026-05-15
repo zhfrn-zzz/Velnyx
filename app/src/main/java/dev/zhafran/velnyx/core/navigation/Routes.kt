@@ -43,6 +43,9 @@ data object HomeRoute
 
 // ── Tracking ─────────────────────────────────────────────────────────────────
 @Serializable
+data object TrackingGraphRoute
+
+@Serializable
 data object CountdownRoute
 
 @Serializable

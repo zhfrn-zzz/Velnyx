@@ -6,6 +6,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dev.zhafran.velnyx.feature.auth.data.AuthRepository
 import dev.zhafran.velnyx.feature.auth.data.AuthRepositoryImpl
+import dev.zhafran.velnyx.feature.history.data.HistoryRepository
+import dev.zhafran.velnyx.feature.history.data.HistoryRepositoryImpl
 import dev.zhafran.velnyx.feature.profile.data.ProfileRepository
 import dev.zhafran.velnyx.feature.profile.data.ProfileRepositoryImpl
 import dev.zhafran.velnyx.feature.tracking.data.ActiveRunRepository
@@ -28,4 +30,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindRunUploadRepository(impl: RunUploadRepositoryImpl): RunUploadRepository
+
+    @Binds
+    abstract fun bindHistoryRepository(impl: HistoryRepositoryImpl): HistoryRepository
 }

@@ -38,11 +38,29 @@ import org.maplibre.geojson.Point
 private const val STYLE_URL =
     "https://api.maptiler.com/maps/streets-v2/style.json?key=${BuildConfig.MAPTILER_API_KEY}"
 
+/**
+ * Reusable MapLibre map.
+ *
+ * Two modes:
+ *  - **autoFollow = true (default)**: live-tracking mode. Seeds the
+ *    camera on Bekasi/Jakarta until the first GPS fix arrives, then
+ *    auto-recenters on `currentLatLng` every ~10 fixes. Used by
+ *    LiveTrackingScreen.
+ *  - **autoFollow = false**: static mode. The map does not move the
+ *    camera on its own. Callers are expected to use [onMapReady] to
+ *    fit the camera to a polyline (e.g. via
+ *    `CameraUpdateFactory.newLatLngBounds`). Used by HistoryDetailScreen.
+ *
+ * [onMapReady] is invoked once, AFTER the style + sources + layers are
+ * fully loaded, so it's safe for the caller to call camera updates or
+ * read style state from inside it.
+ */
 @Composable
 fun VelnyxMapView(
     modifier: Modifier = Modifier,
     currentLatLng: LatLng?,
     routePoints: List<LatLng>,
+    autoFollow: Boolean = true,
     onMapReady: (MapLibreMap) -> Unit = {},
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -58,15 +76,16 @@ fun VelnyxMapView(
                     onResume()
                     Log.d("VelnyxMapView", "Style URL: $STYLE_URL")
                     getMapAsync { map ->
-                        onMapReady(map)
-                        // Default camera position so the map doesn't show the world view
-                        // before the first GPS fix arrives.
-                        map.moveCamera(
-                            CameraUpdateFactory.newLatLngZoom(
-                                LatLng(-6.2146, 106.8451), // Bekasi/Jakarta
-                                12.0,
-                            ),
-                        )
+                        if (autoFollow) {
+                            // Seed camera so live-tracking doesn't show
+                            // the world view before the first GPS fix.
+                            map.moveCamera(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    LatLng(-6.2146, 106.8451), // Bekasi/Jakarta
+                                    12.0,
+                                ),
+                            )
+                        }
                         map.setStyle(STYLE_URL) { style ->
                             // Current position source + layer
                             style.addSource(GeoJsonSource("current-position-source"))
@@ -90,6 +109,11 @@ fun VelnyxMapView(
                                         lineJoin("round"),
                                     ),
                             )
+                            // Hand control to the caller AFTER style is
+                            // fully loaded — this is the right moment to
+                            // run a fit-to-bounds without the default
+                            // camera move overriding it.
+                            onMapReady(map)
                         }
                     }
                     mapViewRef = this
@@ -110,16 +134,19 @@ fun VelnyxMapView(
                         (style.getSource("route-source") as? GeoJsonSource)
                             ?.setGeoJson(Feature.fromGeometry(LineString.fromLngLats(points)))
                     }
-                    // Move on first GPS fix, then every 10 fixes after that.
-                    val shouldAnimateCamera = currentLatLng != null && (
-                        routePoints.size == 1 ||
-                            routePoints.size % 10 == 0
-                        )
-                    if (shouldAnimateCamera) {
-                        map.animateCamera(
-                            CameraUpdateFactory.newLatLngZoom(currentLatLng!!, 16.0),
-                            300,
-                        )
+                    // Auto-recenter (live-tracking only). Move on first
+                    // GPS fix, then every 10 fixes after that.
+                    if (autoFollow) {
+                        val shouldAnimateCamera = currentLatLng != null && (
+                            routePoints.size == 1 ||
+                                routePoints.size % 10 == 0
+                            )
+                        if (shouldAnimateCamera) {
+                            map.animateCamera(
+                                CameraUpdateFactory.newLatLngZoom(currentLatLng!!, 16.0),
+                                300,
+                            )
+                        }
                     }
                 }
             },

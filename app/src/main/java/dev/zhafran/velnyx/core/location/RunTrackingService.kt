@@ -20,6 +20,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import dagger.hilt.android.AndroidEntryPoint
 import dev.zhafran.velnyx.MainActivity
 import dev.zhafran.velnyx.core.data.db.ActiveRunDao
 import dev.zhafran.velnyx.core.data.db.ActiveRunPointEntity
@@ -31,6 +32,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.maplibre.android.geometry.LatLng
+import javax.inject.Inject
 
 /**
  * Stats emitted by the service, derived from Room on each valid GPS fix.
@@ -40,7 +43,11 @@ data class RunStats(
     val durationS: Int = 0,
 )
 
+@AndroidEntryPoint
 class RunTrackingService : Service() {
+
+    @Inject
+    lateinit var locationRepository: LocationRepository
 
     private lateinit var fusedLocation: FusedLocationProviderClient
     private lateinit var dao: ActiveRunDao
@@ -108,6 +115,17 @@ class RunTrackingService : Service() {
     }
 
     private fun processLocation(loc: Location) {
+        // PATH 1 — Map display. Publish every raw fix from the fused
+        // provider, including indoor WiFi/cell-tower fixes with
+        // accuracy > 30m. The map marker should track the user even
+        // when GPS-grade fixes aren't available.
+        locationRepository.publishRaw(LatLng(loc.latitude, loc.longitude))
+
+        // PATH 2 — Run metrics. Filter aggressively: only fixes that
+        // are accurate AND moving contribute to distance / pace /
+        // calories. This prevents distance creep at traffic lights
+        // and rejects garbage WiFi-only fixes drifting hundreds of
+        // meters indoors.
         if (loc.accuracy > ACCURACY_THRESHOLD_M) return
         if (loc.speed < SPEED_THRESHOLD_MS) return
         if (isPaused) return

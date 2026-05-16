@@ -16,7 +16,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import dev.zhafran.velnyx.BuildConfig
-import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapLibreMap
@@ -60,6 +59,14 @@ fun VelnyxMapView(
                     Log.d("VelnyxMapView", "Style URL: $STYLE_URL")
                     getMapAsync { map ->
                         onMapReady(map)
+                        // Default camera position so the map doesn't show the world view
+                        // before the first GPS fix arrives.
+                        map.moveCamera(
+                            CameraUpdateFactory.newLatLngZoom(
+                                LatLng(-6.2146, 106.8451), // Bekasi/Jakarta
+                                12.0,
+                            ),
+                        )
                         map.setStyle(STYLE_URL) { style ->
                             // Current position source + layer
                             style.addSource(GeoJsonSource("current-position-source"))
@@ -103,13 +110,16 @@ fun VelnyxMapView(
                         (style.getSource("route-source") as? GeoJsonSource)
                             ?.setGeoJson(Feature.fromGeometry(LineString.fromLngLats(points)))
                     }
-                    // Animate camera every 10 points
-                    if (currentLatLng != null && routePoints.size % 10 == 0) {
-                        val pos = CameraPosition.Builder()
-                            .target(currentLatLng)
-                            .zoom(16.0)
-                            .build()
-                        map.animateCamera(CameraUpdateFactory.newCameraPosition(pos), 300)
+                    // Move on first GPS fix, then every 10 fixes after that.
+                    val shouldAnimateCamera = currentLatLng != null && (
+                        routePoints.size == 1 ||
+                            routePoints.size % 10 == 0
+                        )
+                    if (shouldAnimateCamera) {
+                        map.animateCamera(
+                            CameraUpdateFactory.newLatLngZoom(currentLatLng!!, 16.0),
+                            300,
+                        )
                     }
                 }
             },

@@ -5,10 +5,12 @@ import dev.zhafran.velnyx.core.data.db.ActiveRunPointEntity
 import kotlinx.coroutines.flow.Flow
 
 interface ActiveRunRepository {
-    suspend fun startRun(): Long
+    suspend fun startRun(): Result<Long>
     suspend fun pause(runId: Long)
     suspend fun resume(runId: Long)
-    suspend fun finish(runId: Long)
+    suspend fun finish(runId: Long): Result<Unit>
     fun observeActiveRun(): Flow<ActiveRunEntity?>
+    fun observeRunById(runId: Long): Flow<ActiveRunEntity?>
+    suspend fun getRunById(runId: Long): ActiveRunEntity?
     fun observePoints(runId: Long): Flow<List<ActiveRunPointEntity>>
 }

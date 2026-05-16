@@ -28,11 +28,26 @@ interface ActiveRunDao {
     @Insert
     suspend fun insertSegment(segment: ActiveRunSegmentEntity)
 
-    @Query("SELECT * FROM active_runs WHERE state != 'FINISHED' LIMIT 1")
+    @Query("SELECT * FROM active_runs WHERE state != 'FINISHED' ORDER BY startedAt DESC LIMIT 1")
     fun observeActiveRun(): Flow<ActiveRunEntity?>
 
-    @Query("SELECT * FROM active_runs WHERE state != 'FINISHED' LIMIT 1")
+    @Query("SELECT * FROM active_runs WHERE state != 'FINISHED' ORDER BY startedAt DESC LIMIT 1")
     suspend fun getActiveRun(): ActiveRunEntity?
+
+    @Query("SELECT * FROM active_runs WHERE id = :runId LIMIT 1")
+    fun observeRunById(runId: Long): Flow<ActiveRunEntity?>
+
+    @Query("SELECT * FROM active_runs WHERE id = :runId LIMIT 1")
+    suspend fun getRunById(runId: Long): ActiveRunEntity?
+
+    @Query("DELETE FROM active_runs")
+    suspend fun deleteAllActiveRuns()
+
+    @Query("DELETE FROM active_run_points")
+    suspend fun deleteAllActivePoints()
+
+    @Query("DELETE FROM active_run_segments")
+    suspend fun deleteAllActiveSegments()
 
     @Query("SELECT * FROM active_run_points WHERE runId = :runId ORDER BY idx")
     fun observePoints(runId: Long): Flow<List<ActiveRunPointEntity>>

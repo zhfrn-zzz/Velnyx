@@ -26,11 +26,11 @@ import dev.zhafran.velnyx.core.designsystem.theme.VelnyxWhite
 
 @Composable
 fun RunSummaryScreen(
-    distanceM: Int = 0,
-    durationMs: Long = 0L,
-    avgPace: Int = 0,
-    calories: Int = 0,
-    onNavigateToHome: () -> Unit = {},
+    distanceM: Int,
+    durationS: Int,
+    avgPace: Int,
+    calories: Int,
+    onDone: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -66,14 +66,14 @@ fun RunSummaryScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            SummaryMetric("DURATION", formatDuration(durationMs))
+            SummaryMetric("DURATION", formatDuration(durationS))
             SummaryMetric("AVG PACE", formatPace(avgPace))
             SummaryMetric("CALORIES", "$calories kcal")
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        VelnyxPrimaryButton(text = "Done", onClick = onNavigateToHome)
+        VelnyxPrimaryButton(text = "Done", onClick = onDone)
 
         Spacer(modifier = Modifier.height(32.dp))
     }
@@ -87,8 +87,8 @@ private fun SummaryMetric(label: String, value: String) {
     }
 }
 
-private fun formatDuration(durationMs: Long): String {
-    val totalSec = (durationMs / 1000).toInt()
+private fun formatDuration(durationS: Int): String {
+    val totalSec = durationS.coerceAtLeast(0)
     val h = totalSec / 3600
     val m = (totalSec % 3600) / 60
     val s = totalSec % 60

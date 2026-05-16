@@ -54,7 +54,7 @@ data object LiveTrackingRoute
 @Serializable
 data class RunSummaryRoute(
     val distanceM: Int = 0,
-    val durationMs: Long = 0L,
+    val durationS: Int = 0,
     val avgPace: Int = 0,
     val calories: Int = 0,
 )

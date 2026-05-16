@@ -4,6 +4,9 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -201,7 +204,11 @@ fun VelnyxNavHost(navController: NavHostController) {
         // ── Tracking (nested graph — shared ViewModel) ──────────────────────
         navigation<TrackingGraphRoute>(startDestination = CountdownRoute) {
             composable<CountdownRoute> { backStackEntry ->
-                val parentEntry = navController.getBackStackEntry(TrackingGraphRoute)
+                val parentEntry = try {
+                    navController.getBackStackEntry(TrackingGraphRoute)
+                } catch (e: IllegalArgumentException) {
+                    return@composable // Graph already popped (exit animation), skip
+                }
                 val viewModel: ActiveRunViewModel = hiltViewModel(parentEntry)
                 val runState by viewModel.state.collectAsStateWithLifecycle()
 
@@ -222,20 +229,29 @@ fun VelnyxNavHost(navController: NavHostController) {
             }
 
             composable<LiveTrackingRoute> { backStackEntry ->
-                val parentEntry = navController.getBackStackEntry(TrackingGraphRoute)
+                val parentEntry = try {
+                    navController.getBackStackEntry(TrackingGraphRoute)
+                } catch (e: IllegalArgumentException) {
+                    return@composable // Graph already popped (exit animation), skip
+                }
                 val viewModel: ActiveRunViewModel = hiltViewModel(parentEntry)
                 val runState by viewModel.state.collectAsStateWithLifecycle()
 
                 BackHandler(enabled = true) { /* no-op — must use finish button */ }
 
+                // One-shot guard: prevents the Finished navigation from re-firing
+                // during recomposition after the tracking graph is popped, which
+                // would re-enter getBackStackEntry(TrackingGraphRoute) and crash.
+                var navigated by remember { mutableStateOf(false) }
                 LaunchedEffect(runState) {
                     val current = runState
-                    if (current is RunState.Finished) {
+                    if (current is RunState.Finished && !navigated) {
+                        navigated = true
                         val s = current.summary
                         navController.navigate(
                             RunSummaryRoute(
                                 distanceM = s.distanceM,
-                                durationMs = s.durationMs,
+                                durationS = (s.durationMs / 1000).toInt(),
                                 avgPace = s.avgPaceSecondsPerKm,
                                 calories = s.calories,
                             )
@@ -254,16 +270,17 @@ fun VelnyxNavHost(navController: NavHostController) {
             }
         }
 
-        composable<RunSummaryRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<RunSummaryRoute>()
+        composable<RunSummaryRoute> { backStack ->
+            val args = backStack.toRoute<RunSummaryRoute>()
             RunSummaryScreen(
-                distanceM = route.distanceM,
-                durationMs = route.durationMs,
-                avgPace = route.avgPace,
-                calories = route.calories,
-                onNavigateToHome = {
+                distanceM = args.distanceM,
+                durationS = args.durationS,
+                avgPace = args.avgPace,
+                calories = args.calories,
+                onDone = {
                     navController.navigate(HomeRoute) {
-                        popUpTo(HomeRoute) { inclusive = true }
+                        popUpTo(navController.graph.startDestinationId) { inclusive = false }
+                        launchSingleTop = true
                     }
                 },
             )

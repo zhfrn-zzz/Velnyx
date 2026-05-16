@@ -52,8 +52,19 @@ interface ActiveRunDao {
     @Query("SELECT * FROM active_run_points WHERE runId = :runId ORDER BY idx")
     fun observePoints(runId: Long): Flow<List<ActiveRunPointEntity>>
 
+    // One-shot snapshot of points, used by the upload pipeline (M3) so it
+    // doesn't have to consume a Flow inside a non-collecting suspend path.
+    @Query("SELECT * FROM active_run_points WHERE runId = :runId ORDER BY idx")
+    suspend fun getPoints(runId: Long): List<ActiveRunPointEntity>
+
     @Query("SELECT COUNT(*) FROM active_run_points WHERE runId = :runId")
     suspend fun getPointCount(runId: Long): Int
+
+    // Per-id delete used by the upload pipeline after a successful Supabase
+    // sync. Foreign keys on active_run_points and active_run_segments cascade,
+    // so this single statement cleans up all three tables for `runId`.
+    @Query("DELETE FROM active_runs WHERE id = :runId")
+    suspend fun deleteActiveRunById(runId: Long)
 
     @Query("SELECT * FROM active_run_segments WHERE runId = :runId ORDER BY segmentIdx")
     suspend fun getSegments(runId: Long): List<ActiveRunSegmentEntity>

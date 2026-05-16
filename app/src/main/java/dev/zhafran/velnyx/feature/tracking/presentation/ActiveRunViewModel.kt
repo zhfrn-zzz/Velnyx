@@ -11,6 +11,9 @@ import dev.zhafran.velnyx.core.location.RunTrackingService
 import dev.zhafran.velnyx.core.util.MetCalculator
 import dev.zhafran.velnyx.feature.profile.data.ProfileRepository
 import dev.zhafran.velnyx.feature.tracking.data.ActiveRunRepository
+import dev.zhafran.velnyx.feature.tracking.data.RunUploadRepository
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.auth
 import org.maplibre.android.geometry.LatLng
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -56,6 +59,8 @@ class ActiveRunViewModel @Inject constructor(
     private val repository: ActiveRunRepository,
     private val profileRepository: ProfileRepository,
     private val locationRepository: LocationRepository,
+    private val runUploadRepository: RunUploadRepository,
+    private val supabase: SupabaseClient,
 ) : AndroidViewModel(app) {
 
     private val _state = MutableStateFlow<RunState>(RunState.Idle)
@@ -138,14 +143,38 @@ class ActiveRunViewModel @Inject constructor(
                 runCatching { app.startService(RunTrackingService.stopIntent(app)) }
                     .onFailure { e -> Log.e("ActiveRunViewModel", "stopService failed", e) }
                 delay(100)
-                _state.value = RunState.Finished(
-                    RunSummary(
-                        distanceM = stats.distanceM,
-                        durationMs = stats.durationMs,
-                        avgPaceSecondsPerKm = stats.avgPaceSecondsPerKm,
-                        calories = stats.calories,
-                    )
+                val finalSummary = RunSummary(
+                    distanceM = stats.distanceM,
+                    durationMs = stats.durationMs,
+                    avgPaceSecondsPerKm = stats.avgPaceSecondsPerKm,
+                    calories = stats.calories,
                 )
+                _state.value = RunState.Finished(finalSummary)
+
+                // Fire-and-forget Supabase upload. The user has already been
+                // shown the summary screen by this point — we don't block
+                // navigation on the network round-trip. Failures are logged
+                // only; Room data is preserved on failure (see
+                // RunUploadRepositoryImpl) so a future retry path can pick
+                // it up. If the VM is cleared before the upload completes,
+                // viewModelScope cancels the job — that's acceptable here.
+                val capturedRunId = runId
+                viewModelScope.launch {
+                    try {
+                        val userId = supabase.auth.currentUserOrNull()?.id ?: run {
+                            Log.w("ActiveRunViewModel", "uploadRun skipped: no auth user")
+                            return@launch
+                        }
+                        runUploadRepository.uploadRun(capturedRunId, finalSummary, userId)
+                            .onFailure { e ->
+                                Log.e("ActiveRunViewModel", "uploadRun failed", e)
+                            }
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Log.e("ActiveRunViewModel", "uploadRun error", e)
+                    }
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

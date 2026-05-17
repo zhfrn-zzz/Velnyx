@@ -63,6 +63,7 @@ fun LiveTrackingScreen(
     if (showFinishDialog) {
         AlertDialog(
             onDismissRequest = { showFinishDialog = false },
+            shape = RoundedCornerShape(16.dp),
             title = { Text("End this run?") },
             confirmButton = {
                 TextButton(onClick = {

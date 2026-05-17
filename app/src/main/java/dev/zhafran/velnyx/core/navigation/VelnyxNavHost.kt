@@ -24,6 +24,7 @@ import dev.zhafran.velnyx.feature.clubs.presentation.ClubsScreen
 import dev.zhafran.velnyx.feature.history.presentation.HistoryDetailScreen
 import dev.zhafran.velnyx.feature.history.presentation.HistoryListScreen
 import dev.zhafran.velnyx.feature.home.presentation.HomeScreen
+import dev.zhafran.velnyx.feature.home.presentation.InfoDetailScreen
 import dev.zhafran.velnyx.feature.onboarding.presentation.PermissionAutostartScreen
 import dev.zhafran.velnyx.feature.onboarding.presentation.PermissionBackgroundScreen
 import dev.zhafran.velnyx.feature.onboarding.presentation.PermissionBatteryScreen
@@ -198,6 +199,17 @@ fun VelnyxNavHost(navController: NavHostController) {
                 onNavigateToPrograms = { navController.navigate(ProgramsRoute) },
                 onNavigateToClubs = { navController.navigate(ClubsRoute) },
                 onNavigateToSettings = { navController.navigate(SettingsRoute) },
+                onNavigateToInfoDetail = { articleId ->
+                    navController.navigate(InfoDetailRoute(articleId = articleId))
+                },
+            )
+        }
+
+        composable<InfoDetailRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<InfoDetailRoute>()
+            InfoDetailScreen(
+                articleId = route.articleId,
+                onNavigateBack = { navController.popBackStack() },
             )
         }
 
@@ -321,6 +333,11 @@ fun VelnyxNavHost(navController: NavHostController) {
         composable<SettingsRoute> {
             SettingsScreen(
                 onNavigateBack = { navController.popBackStack() },
+                onSignedOut = {
+                    navController.navigate(GetStartedRoute) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
             )
         }
     }

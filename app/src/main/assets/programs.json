@@ -1,0 +1,167 @@
+[
+  {
+    "id": "kipchoge_marathon",
+    "title": "Kipchoge Marathon Plan",
+    "subtitle": "26.2km · 16 weeks",
+    "description": "Train like the GOAT. Progressive long runs building to 32km peak week, with weekly tempo and recovery sessions modelled on Eliud Kipchoge's marathon prep philosophy.",
+    "image_emoji": "🏃",
+    "weeks": [
+      {
+        "week": 1,
+        "days": [
+          {"day": "Mon", "workout": "Rest"},
+          {"day": "Tue", "workout": "Easy 8km"},
+          {"day": "Wed", "workout": "Tempo 6km"},
+          {"day": "Thu", "workout": "Easy 10km"},
+          {"day": "Fri", "workout": "Rest"},
+          {"day": "Sat", "workout": "Long 18km"},
+          {"day": "Sun", "workout": "Recovery 5km"}
+        ]
+      },
+      {
+        "week": 2,
+        "days": [
+          {"day": "Mon", "workout": "Rest"},
+          {"day": "Tue", "workout": "Easy 10km"},
+          {"day": "Wed", "workout": "Intervals 6 × 800m"},
+          {"day": "Thu", "workout": "Easy 12km"},
+          {"day": "Fri", "workout": "Rest"},
+          {"day": "Sat", "workout": "Long 22km"},
+          {"day": "Sun", "workout": "Recovery 6km"}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "kiplimo_half_marathon",
+    "title": "Kiplimo Half Marathon",
+    "subtitle": "21.1km · 12 weeks",
+    "description": "Built for half-marathon ambition. Sharp tempo work and steady long runs inspired by Jacob Kiplimo's record-breaking 21.1km speed.",
+    "image_emoji": "🥇",
+    "weeks": [
+      {
+        "week": 1,
+        "days": [
+          {"day": "Mon", "workout": "Rest"},
+          {"day": "Tue", "workout": "Easy 6km"},
+          {"day": "Wed", "workout": "Tempo 5km"},
+          {"day": "Thu", "workout": "Easy 8km"},
+          {"day": "Fri", "workout": "Rest"},
+          {"day": "Sat", "workout": "Long 14km"},
+          {"day": "Sun", "workout": "Recovery 4km"}
+        ]
+      },
+      {
+        "week": 2,
+        "days": [
+          {"day": "Mon", "workout": "Rest"},
+          {"day": "Tue", "workout": "Easy 7km"},
+          {"day": "Wed", "workout": "Hill repeats 5 × 400m"},
+          {"day": "Thu", "workout": "Easy 8km"},
+          {"day": "Fri", "workout": "Rest"},
+          {"day": "Sat", "workout": "Long 16km"},
+          {"day": "Sun", "workout": "Recovery 5km"}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cheptegei_10k",
+    "title": "Cheptegei 10K Crusher",
+    "subtitle": "10km · 10 weeks",
+    "description": "Track-flavoured 10K plan styled after Joshua Cheptegei. Heavy on intervals, threshold reps, and tactical pacing.",
+    "image_emoji": "⚡",
+    "weeks": [
+      {
+        "week": 1,
+        "days": [
+          {"day": "Mon", "workout": "Rest"},
+          {"day": "Tue", "workout": "Easy 5km"},
+          {"day": "Wed", "workout": "Intervals 8 × 400m"},
+          {"day": "Thu", "workout": "Easy 6km"},
+          {"day": "Fri", "workout": "Rest"},
+          {"day": "Sat", "workout": "Tempo 8km"},
+          {"day": "Sun", "workout": "Long 10km"}
+        ]
+      },
+      {
+        "week": 2,
+        "days": [
+          {"day": "Mon", "workout": "Rest"},
+          {"day": "Tue", "workout": "Easy 6km"},
+          {"day": "Wed", "workout": "Intervals 10 × 400m"},
+          {"day": "Thu", "workout": "Easy 7km"},
+          {"day": "Fri", "workout": "Rest"},
+          {"day": "Sat", "workout": "Tempo 10km"},
+          {"day": "Sun", "workout": "Long 12km"}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "beginner_5k",
+    "title": "Beginner 5K Starter",
+    "subtitle": "5km · 8 weeks",
+    "description": "Couch-to-5K friendly progression. Walk-run intervals build into continuous easy 5K runs without burning out new legs.",
+    "image_emoji": "🌱",
+    "weeks": [
+      {
+        "week": 1,
+        "days": [
+          {"day": "Mon", "workout": "Rest"},
+          {"day": "Tue", "workout": "Walk-run 20 min"},
+          {"day": "Wed", "workout": "Rest"},
+          {"day": "Thu", "workout": "Walk-run 20 min"},
+          {"day": "Fri", "workout": "Rest"},
+          {"day": "Sat", "workout": "Walk-run 25 min"},
+          {"day": "Sun", "workout": "Recovery walk 30 min"}
+        ]
+      },
+      {
+        "week": 2,
+        "days": [
+          {"day": "Mon", "workout": "Rest"},
+          {"day": "Tue", "workout": "Easy run 2km"},
+          {"day": "Wed", "workout": "Rest"},
+          {"day": "Thu", "workout": "Easy run 3km"},
+          {"day": "Fri", "workout": "Rest"},
+          {"day": "Sat", "workout": "Easy run 3.5km"},
+          {"day": "Sun", "workout": "Recovery walk 30 min"}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "speed_builder",
+    "title": "Speed Builder",
+    "subtitle": "Mixed · 6 weeks",
+    "description": "Short, intense plan for runners chasing a faster top-end gear. Strides, intervals, and explosive hill sessions.",
+    "image_emoji": "🔥",
+    "weeks": [
+      {
+        "week": 1,
+        "days": [
+          {"day": "Mon", "workout": "Rest"},
+          {"day": "Tue", "workout": "Easy 5km + 6 strides"},
+          {"day": "Wed", "workout": "Intervals 5 × 200m"},
+          {"day": "Thu", "workout": "Easy 6km"},
+          {"day": "Fri", "workout": "Rest"},
+          {"day": "Sat", "workout": "Hill repeats 8 × 100m"},
+          {"day": "Sun", "workout": "Recovery 4km"}
+        ]
+      },
+      {
+        "week": 2,
+        "days": [
+          {"day": "Mon", "workout": "Rest"},
+          {"day": "Tue", "workout": "Easy 6km + 8 strides"},
+          {"day": "Wed", "workout": "Intervals 6 × 300m"},
+          {"day": "Thu", "workout": "Easy 7km"},
+          {"day": "Fri", "workout": "Rest"},
+          {"day": "Sat", "workout": "Hill repeats 10 × 100m"},
+          {"day": "Sun", "workout": "Recovery 5km"}
+        ]
+      }
+    ]
+  }
+]

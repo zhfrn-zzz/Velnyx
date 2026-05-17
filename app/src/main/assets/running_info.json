@@ -1,0 +1,30 @@
+[
+  {
+    "id": "warmup",
+    "title": "Why Warm-Up Matters",
+    "category": "Technique",
+    "emoji": "🔥",
+    "body": "A proper warm-up raises your core temperature, opens up hip and ankle range of motion, and primes the nervous system for harder work. Spend 5–10 minutes on easy jogging followed by leg swings, walking lunges, and a few strides. Skipping the warm-up is one of the fastest paths to a tweaked calf or a sluggish first kilometre."
+  },
+  {
+    "id": "pace_zones",
+    "title": "Understanding Pace Zones",
+    "category": "Training",
+    "emoji": "📈",
+    "body": "Most plans split running into easy, tempo, threshold, and interval zones. Easy runs build aerobic base and should feel conversational. Tempo runs sit at a 'comfortably hard' effort. Threshold work touches your lactate ceiling. Intervals push VO2 max. Mixing zones across a week is what creates real fitness gains — running every session at the same pace is the most common mistake."
+  },
+  {
+    "id": "hydration",
+    "title": "Hydration in Tropical Heat",
+    "category": "Health",
+    "emoji": "💧",
+    "body": "Indonesia's humidity makes hydration non-negotiable. For runs over 60 minutes, carry electrolytes — plain water alone won't replace the sodium you sweat out. Pre-hydrate the night before, sip steadily during long runs, and weigh yourself before and after a session to estimate fluid loss. Down 500ml of water plus electrolytes for every kilogram lost."
+  },
+  {
+    "id": "shoe_rotation",
+    "title": "Why You Need a Shoe Rotation",
+    "category": "Gear",
+    "emoji": "👟",
+    "body": "Running in the same shoe every day is hard on your tendons and your wallet. A simple two-shoe rotation — a cushioned daily trainer and a lighter tempo shoe — varies the load on your legs, lets foam recover between runs, and stretches each pair's lifespan. Save your race-day super shoes for workouts and races, not easy kilometres."
+  }
+]

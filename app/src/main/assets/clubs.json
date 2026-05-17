@@ -1,0 +1,50 @@
+[
+  {
+    "id": "tangerang_runners",
+    "name": "Tangerang Runners",
+    "city": "Tangerang",
+    "members": 1240,
+    "description": "Friendly weekend crew running scenic loops around BSD City and Alam Sutera. Pacers cover beginner to sub-5:00/km groups.",
+    "schedule": "Every Saturday 05:30 WIB at Taman Gajah"
+  },
+  {
+    "id": "jakbar_pacer",
+    "name": "JakBar Pacer",
+    "city": "Jakarta Barat",
+    "members": 980,
+    "description": "West Jakarta's tempo-and-track community. Mix of road runners and trackies hammering Senayan oval reps midweek.",
+    "schedule": "Every Wednesday 19:00 WIB at GBK Stadium"
+  },
+  {
+    "id": "bekasi_run_club",
+    "name": "Bekasi Run Club",
+    "city": "Bekasi",
+    "members": 760,
+    "description": "Suburban run club focused on long Sunday miles around Summarecon Bekasi. Strong supportive Strava chat group.",
+    "schedule": "Every Sunday 05:00 WIB at Summarecon Mal Bekasi"
+  },
+  {
+    "id": "bandung_highlanders",
+    "name": "Bandung Highlanders",
+    "city": "Bandung",
+    "members": 540,
+    "description": "Hill-loving runners in Bandung. Weekly route stitches Dago, Punclut, and Lembang for honest elevation gain.",
+    "schedule": "Every Saturday 06:00 WIB at Lapangan Gasibu"
+  },
+  {
+    "id": "jakarta_pace_lab",
+    "name": "Jakarta Pace Lab",
+    "city": "Jakarta Selatan",
+    "members": 1410,
+    "description": "Data-nerd running collective. Workouts published with target paces and HR zones for half and full marathon training blocks.",
+    "schedule": "Every Tuesday 19:30 WIB at Senayan Sport Complex"
+  },
+  {
+    "id": "tangsel_trail_pack",
+    "name": "Tangsel Trail Pack",
+    "city": "Tangerang Selatan",
+    "members": 320,
+    "description": "Off-road focused. Trail-shoe Saturday runs across Sentul, Cilodong, and Bukit Pelangi when the rain calms down.",
+    "schedule": "Every Saturday 05:30 WIB at BSD Green Office Park"
+  }
+]

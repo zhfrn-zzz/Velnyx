@@ -73,6 +73,9 @@ data object ProgramsRoute
 @Serializable
 data object ClubsRoute
 
+@Serializable
+data class InfoDetailRoute(val articleId: String)
+
 // ── Profile ──────────────────────────────────────────────────────────────────
 @Serializable
 data object SettingsRoute

@@ -23,6 +23,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -31,6 +33,8 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +55,7 @@ import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxWhite
 import dev.zhafran.velnyx.feature.history.data.RunSummaryDto
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -66,6 +71,8 @@ fun HistoryListScreen(
     val uiState by viewModel.runs.collectAsStateWithLifecycle()
     val isRefreshing = uiState is HistoryUiState.Loading
     val pullState = rememberPullToRefreshState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -84,6 +91,7 @@ fun HistoryListScreen(
                 ),
             )
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         PullToRefreshBox(
@@ -99,7 +107,14 @@ fun HistoryListScreen(
                 is HistoryUiState.Empty -> EmptyState()
                 is HistoryUiState.Error -> ErrorState(
                     message = state.msg,
-                    onRetry = viewModel::refresh,
+                    onRetry = {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                "Couldn't load runs. Check your connection."
+                            )
+                        }
+                        viewModel.refresh()
+                    },
                 )
                 is HistoryUiState.Success -> SuccessContent(
                     runs = state.runs,

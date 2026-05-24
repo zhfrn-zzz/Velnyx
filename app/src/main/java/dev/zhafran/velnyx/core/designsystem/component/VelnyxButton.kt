@@ -17,6 +17,7 @@ import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray200
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray400
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxLime
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxWhite
 
 @Composable
 fun VelnyxPrimaryButton(
@@ -62,7 +63,7 @@ fun VelnyxSecondaryButton(
         shape = MaterialTheme.shapes.extraLarge,
         border = BorderStroke(1.5.dp, if (enabled) VelnyxLime else VelnyxGray200),
         colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = VelnyxBlack,
+            contentColor = VelnyxWhite,
             disabledContentColor = VelnyxGray400,
         ),
     ) {

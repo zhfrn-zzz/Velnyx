@@ -40,8 +40,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.zhafran.velnyx.core.designsystem.component.VelnyxPrimaryButton
 import dev.zhafran.velnyx.core.designsystem.component.VelnyxTextField
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxBlack
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxError
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray100
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxLime
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxWhite
 
 @Composable
 fun SignUpScreen(
@@ -53,7 +57,6 @@ fun SignUpScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Collect one-shot navigation events from ViewModel
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
@@ -68,7 +71,7 @@ fun SignUpScreen(
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background,
+        color = VelnyxBlack,
     ) {
         Column(
             modifier = Modifier
@@ -77,20 +80,20 @@ fun SignUpScreen(
                 .imePadding()
                 .padding(VelnyxSpacing.lg),
         ) {
-            // Back button
             IconButton(onClick = onNavigateBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Go back",
+                    tint = VelnyxWhite,
                 )
             }
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.xl))
 
-            // Title
             Text(
                 text = "Create an account",
                 style = MaterialTheme.typography.headlineLarge,
+                color = VelnyxWhite,
             )
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.sm))
@@ -98,12 +101,11 @@ fun SignUpScreen(
             Text(
                 text = "Start your running journey today",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = VelnyxGray100,
             )
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.xl))
 
-            // Display name field
             VelnyxTextField(
                 value = uiState.displayName,
                 onValueChange = viewModel::onDisplayNameChange,
@@ -119,7 +121,6 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.md))
 
-            // Email field
             VelnyxTextField(
                 value = uiState.email,
                 onValueChange = viewModel::onEmailChange,
@@ -136,7 +137,6 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.md))
 
-            // Password field
             VelnyxTextField(
                 value = uiState.password,
                 onValueChange = viewModel::onPasswordChange,
@@ -168,7 +168,6 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.md))
 
-            // Confirm password field
             VelnyxTextField(
                 value = uiState.confirmPassword,
                 onValueChange = viewModel::onConfirmPasswordChange,
@@ -208,7 +207,6 @@ fun SignUpScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             )
 
-            // Error message
             if (uiState.error != null) {
                 Spacer(modifier = Modifier.height(VelnyxSpacing.sm))
                 Text(
@@ -220,13 +218,12 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.xl))
 
-            // Submit button
             if (uiState.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .size(48.dp)
                         .align(Alignment.CenterHorizontally),
-                    color = MaterialTheme.colorScheme.primary,
+                    color = VelnyxLime,
                 )
             } else {
                 VelnyxPrimaryButton(
@@ -238,12 +235,14 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.md))
 
-            // Navigate to login
             TextButton(
                 onClick = onNavigateToLogin,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             ) {
-                Text("Already have an account? Log in")
+                Text(
+                    text = "Already have an account? Log in",
+                    color = VelnyxLime,
+                )
             }
         }
     }

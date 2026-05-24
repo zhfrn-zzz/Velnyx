@@ -5,15 +5,38 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import dev.zhafran.velnyx.core.designsystem.theme.VelnyxBlack
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxError
-import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray200
-import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray400
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray100
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxLime
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxWhite
+
+@Composable
+fun velnyxDarkTextFieldColors(): TextFieldColors = OutlinedTextFieldDefaults.colors(
+    focusedBorderColor = VelnyxLime,
+    unfocusedBorderColor = VelnyxGray100.copy(alpha = 0.5f),
+    errorBorderColor = VelnyxError,
+    focusedLabelColor = VelnyxLime,
+    unfocusedLabelColor = VelnyxGray100,
+    cursorColor = VelnyxLime,
+    focusedTextColor = VelnyxWhite,
+    unfocusedTextColor = VelnyxWhite,
+    focusedLeadingIconColor = VelnyxGray100,
+    unfocusedLeadingIconColor = VelnyxGray100,
+    focusedTrailingIconColor = VelnyxGray100,
+    unfocusedTrailingIconColor = VelnyxGray100,
+    focusedSupportingTextColor = VelnyxGray100,
+    unfocusedSupportingTextColor = VelnyxGray100,
+    errorSupportingTextColor = VelnyxError,
+    focusedPlaceholderColor = Color.White.copy(alpha = 0.5f),
+    unfocusedPlaceholderColor = Color.White.copy(alpha = 0.5f),
+)
 
 @Composable
 fun VelnyxTextField(
@@ -28,6 +51,7 @@ fun VelnyxTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     singleLine: Boolean = true,
+    colors: TextFieldColors = velnyxDarkTextFieldColors(),
 ) {
     OutlinedTextField(
         value = value,
@@ -42,17 +66,11 @@ fun VelnyxTextField(
         keyboardOptions = keyboardOptions,
         singleLine = singleLine,
         shape = MaterialTheme.shapes.medium,
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = VelnyxBlack,
-            unfocusedBorderColor = VelnyxGray200,
-            errorBorderColor = VelnyxError,
-            focusedLabelColor = VelnyxBlack,
-            unfocusedLabelColor = VelnyxGray400,
-        ),
+        colors = colors,
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0A0A0A)
 @Composable
 private fun VelnyxTextFieldPreview() {
     VelnyxTheme {
@@ -64,7 +82,7 @@ private fun VelnyxTextFieldPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0A0A0A)
 @Composable
 private fun VelnyxTextFieldErrorPreview() {
     VelnyxTheme {

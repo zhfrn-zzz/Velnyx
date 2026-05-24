@@ -21,9 +21,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.zhafran.velnyx.core.designsystem.component.VelnyxPrimaryButton
 import dev.zhafran.velnyx.core.designsystem.component.VelnyxTextField
-import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray600
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxBlack
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxError
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray100
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxWhite
 
 @Composable
 fun ProfileSetupScreen(
@@ -57,7 +60,7 @@ private fun ProfileSetupContent(
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background,
+        color = VelnyxBlack,
     ) {
         Column(
             modifier = Modifier
@@ -70,12 +73,13 @@ private fun ProfileSetupContent(
             Text(
                 text = "Tell us about you",
                 style = MaterialTheme.typography.headlineLarge,
+                color = VelnyxWhite,
             )
 
             Text(
                 text = "We'll use this to calculate your calories burned during runs.",
                 style = MaterialTheme.typography.bodyLarge,
-                color = VelnyxGray600,
+                color = VelnyxGray100,
             )
 
             Spacer(Modifier.height(VelnyxSpacing.sm))
@@ -108,7 +112,7 @@ private fun ProfileSetupContent(
             if (state.generalError != null) {
                 Text(
                     text = state.generalError,
-                    color = MaterialTheme.colorScheme.error,
+                    color = VelnyxError,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
@@ -124,7 +128,7 @@ private fun ProfileSetupContent(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0A0A0A)
 @Composable
 private fun ProfileSetupScreenPreview() {
     VelnyxTheme {

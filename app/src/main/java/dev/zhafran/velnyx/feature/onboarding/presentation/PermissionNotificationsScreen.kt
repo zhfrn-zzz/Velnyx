@@ -20,7 +20,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
-import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray400
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray100
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
 import dev.zhafran.velnyx.core.util.PermissionHelper
@@ -77,7 +77,7 @@ fun PermissionNotificationsScreen(
                 Text(
                     text = "Skip all (dev)",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = VelnyxGray400,
+                    color = VelnyxGray100,
                 )
             }
         },

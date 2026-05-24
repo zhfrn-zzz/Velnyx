@@ -18,8 +18,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.zhafran.velnyx.core.designsystem.component.VelnyxPrimaryButton
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxBlack
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray100
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxLime
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxWhite
 
 @Composable
 fun ConfirmEmailScreen(
@@ -28,7 +32,7 @@ fun ConfirmEmailScreen(
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background,
+        color = VelnyxBlack,
     ) {
         Column(
             modifier = Modifier
@@ -42,7 +46,7 @@ fun ConfirmEmailScreen(
                 imageVector = Icons.Outlined.MarkEmailRead,
                 contentDescription = null,
                 modifier = Modifier.height(64.dp),
-                tint = MaterialTheme.colorScheme.primary,
+                tint = VelnyxLime,
             )
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.xl))
@@ -50,6 +54,7 @@ fun ConfirmEmailScreen(
             Text(
                 text = "Check your email",
                 style = MaterialTheme.typography.headlineMedium,
+                color = VelnyxWhite,
             )
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.md))
@@ -57,7 +62,7 @@ fun ConfirmEmailScreen(
             Text(
                 text = "We sent a confirmation link to\n$email\n\nTap the link to activate your account, then come back to log in.",
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = VelnyxGray100,
                 textAlign = TextAlign.Center,
             )
 
@@ -71,7 +76,7 @@ fun ConfirmEmailScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0A0A0A)
 @Composable
 private fun ConfirmEmailScreenPreview() {
     VelnyxTheme {

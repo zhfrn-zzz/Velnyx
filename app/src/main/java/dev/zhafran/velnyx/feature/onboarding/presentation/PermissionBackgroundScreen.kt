@@ -27,7 +27,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray400
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray100
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
 import dev.zhafran.velnyx.core.util.PermissionHelper
@@ -85,7 +85,7 @@ fun PermissionBackgroundScreen(
                 Text(
                     text = "Tap Permissions → Location → Allow all the time",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = VelnyxGray400,
+                    color = VelnyxGray100,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()

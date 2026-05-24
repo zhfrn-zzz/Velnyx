@@ -39,8 +39,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.zhafran.velnyx.core.designsystem.component.VelnyxPrimaryButton
 import dev.zhafran.velnyx.core.designsystem.component.VelnyxTextField
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxBlack
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxError
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray100
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxLime
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxWhite
 
 @Composable
 fun LoginScreen(
@@ -51,7 +55,6 @@ fun LoginScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Collect one-shot navigation events from ViewModel
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
@@ -64,7 +67,7 @@ fun LoginScreen(
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background,
+        color = VelnyxBlack,
     ) {
         Column(
             modifier = Modifier
@@ -73,20 +76,20 @@ fun LoginScreen(
                 .imePadding()
                 .padding(VelnyxSpacing.lg),
         ) {
-            // Back button
             IconButton(onClick = onNavigateBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Go back",
+                    tint = VelnyxWhite,
                 )
             }
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.xl))
 
-            // Title
             Text(
                 text = "Welcome runners !",
                 style = MaterialTheme.typography.headlineLarge,
+                color = VelnyxWhite,
             )
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.sm))
@@ -94,12 +97,11 @@ fun LoginScreen(
             Text(
                 text = "Sign in to continue your journey",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = VelnyxGray100,
             )
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.xl))
 
-            // Email field
             VelnyxTextField(
                 value = uiState.email,
                 onValueChange = viewModel::onEmailChange,
@@ -116,7 +118,6 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.md))
 
-            // Password field
             VelnyxTextField(
                 value = uiState.password,
                 onValueChange = viewModel::onPasswordChange,
@@ -146,7 +147,6 @@ fun LoginScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             )
 
-            // Error message
             if (uiState.error != null) {
                 Spacer(modifier = Modifier.height(VelnyxSpacing.sm))
                 Text(
@@ -158,13 +158,12 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.xl))
 
-            // Submit button
             if (uiState.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .size(48.dp)
                         .align(Alignment.CenterHorizontally),
-                    color = MaterialTheme.colorScheme.primary,
+                    color = VelnyxLime,
                 )
             } else {
                 VelnyxPrimaryButton(
@@ -176,12 +175,14 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(VelnyxSpacing.md))
 
-            // Navigate to sign up
             TextButton(
                 onClick = onNavigateToSignUp,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             ) {
-                Text("Don't have an account? Sign up")
+                Text(
+                    text = "Don't have an account? Sign up",
+                    color = VelnyxLime,
+                )
             }
         }
     }

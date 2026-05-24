@@ -24,11 +24,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.zhafran.velnyx.core.designsystem.component.VelnyxPrimaryButton
-import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray400
-import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray600
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxBlack
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray100
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxLime
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxOffBlack
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxWhite
 
 @Composable
 fun PermissionStepLayout(
@@ -45,25 +47,23 @@ fun PermissionStepLayout(
 ) {
     Surface(
         modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background,
+        color = VelnyxBlack,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(VelnyxSpacing.lg),
         ) {
-            // Progress
             LinearProgressIndicator(
                 progress = { progress },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(6.dp),
                 color = VelnyxLime,
-                trackColor = MaterialTheme.colorScheme.outline,
+                trackColor = VelnyxOffBlack,
                 strokeCap = StrokeCap.Round,
             )
 
-            // Center content
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -83,16 +83,16 @@ fun PermissionStepLayout(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.headlineLarge,
+                    color = VelnyxWhite,
                 )
                 Spacer(modifier = Modifier.height(VelnyxSpacing.md))
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = VelnyxGray600,
+                    color = VelnyxGray100,
                 )
             }
 
-            // Buttons
             VelnyxPrimaryButton(
                 text = primaryButtonText,
                 onClick = onPrimaryClick,
@@ -107,7 +107,7 @@ fun PermissionStepLayout(
                     Text(
                         text = secondaryButtonText,
                         style = MaterialTheme.typography.labelLarge,
-                        color = VelnyxGray400,
+                        color = VelnyxWhite,
                     )
                 }
             }
@@ -115,7 +115,7 @@ fun PermissionStepLayout(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0A0A0A)
 @Composable
 private fun PermissionStepLayoutPreview() {
     VelnyxTheme {

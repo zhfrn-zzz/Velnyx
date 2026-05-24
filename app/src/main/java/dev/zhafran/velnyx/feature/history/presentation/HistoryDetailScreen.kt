@@ -14,10 +14,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,13 +39,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import dev.zhafran.velnyx.core.designsystem.component.VelnyxCard
 import dev.zhafran.velnyx.core.designsystem.component.VelnyxMapView
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxBlack
-import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray100
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray400
-import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray600
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxLime
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxOffBlack
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxWhite
 import dev.zhafran.velnyx.feature.history.data.RunPointDto
 import dev.zhafran.velnyx.feature.history.data.RunSummaryDto
 import org.maplibre.android.camera.CameraUpdateFactory
@@ -57,9 +60,6 @@ fun HistoryDetailScreen(
     onNavigateBack: () -> Unit = {},
     viewModel: HistoryDetailViewModel = hiltViewModel(),
 ) {
-    // `runId` is also resolved by the VM via SavedStateHandle; the
-    // screen-level param exists so the NavHost call site stays
-    // explicit and so previews can pass synthetic ids.
     @Suppress("UNUSED_PARAMETER") val ignored = runId
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
@@ -69,7 +69,10 @@ fun HistoryDetailScreen(
             TopAppBar(
                 title = { Text("Run detail") },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(
+                        onClick = onNavigateBack,
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = VelnyxWhite),
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
@@ -77,11 +80,12 @@ fun HistoryDetailScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
+                    containerColor = VelnyxBlack,
+                    titleContentColor = VelnyxWhite,
                 ),
             )
         },
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = VelnyxBlack,
     ) { padding ->
         Box(
             modifier = Modifier
@@ -130,7 +134,7 @@ private fun DateHeader(run: RunSummaryDto) {
     Text(
         text = formatDate(run.startedAt),
         style = MaterialTheme.typography.headlineLarge,
-        color = VelnyxBlack,
+        color = VelnyxWhite,
     )
 }
 
@@ -182,12 +186,16 @@ private fun StatCell(
     unit: String?,
     modifier: Modifier = Modifier,
 ) {
-    VelnyxCard(modifier = modifier) {
-        Column {
+    Card(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = VelnyxOffBlack),
+    ) {
+        Column(modifier = Modifier.padding(VelnyxSpacing.md)) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelLarge,
-                color = VelnyxGray600,
+                color = VelnyxGray400,
             )
             Spacer(modifier = Modifier.height(VelnyxSpacing.xs))
             Row(verticalAlignment = Alignment.Bottom) {
@@ -195,14 +203,14 @@ private fun StatCell(
                     text = value,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = VelnyxBlack,
+                    color = VelnyxLime,
                 )
                 if (unit != null) {
                     Spacer(modifier = Modifier.padding(start = 4.dp))
                     Text(
                         text = unit,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = VelnyxGray600,
+                        color = VelnyxGray400,
                         modifier = Modifier.padding(bottom = 4.dp),
                     )
                 }
@@ -226,20 +234,18 @@ private fun RouteMap(points: List<RunPointDto>) {
     ) {
         VelnyxMapView(
             modifier = Modifier.fillMaxSize(),
-            currentLatLng = firstPoint, // start marker
+            currentLatLng = firstPoint,
             routePoints = latLngs,
-            autoFollow = false, // static — we drive the camera via onMapReady
+            autoFollow = false,
             onMapReady = { map ->
                 if (latLngs.size >= 2) {
                     val boundsBuilder = LatLngBounds.Builder()
                     latLngs.forEach { boundsBuilder.include(it) }
                     val bounds = boundsBuilder.build()
-                    // MapLibre's newLatLngBounds takes padding in pixels.
                     map.animateCamera(
                         CameraUpdateFactory.newLatLngBounds(bounds, paddingPx),
                     )
                 } else if (firstPoint != null) {
-                    // Single-point run: just center on it at street zoom.
                     map.animateCamera(
                         CameraUpdateFactory.newLatLngZoom(firstPoint, 16.0),
                     )
@@ -251,23 +257,27 @@ private fun RouteMap(points: List<RunPointDto>) {
 
 @Composable
 private fun NoRouteCard() {
-    VelnyxCard(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = VelnyxOffBlack),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = VelnyxSpacing.md),
+                .padding(VelnyxSpacing.md),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = "No route recorded",
                 style = MaterialTheme.typography.titleLarge,
-                color = VelnyxBlack,
+                color = VelnyxWhite,
             )
             Spacer(modifier = Modifier.height(VelnyxSpacing.xs))
             Text(
                 text = "This run finished without any GPS fixes.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = VelnyxGray600,
+                color = VelnyxGray400,
                 textAlign = TextAlign.Center,
             )
         }
@@ -279,7 +289,7 @@ private fun NoRouteCard() {
 @Composable
 private fun LoadingState() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        CircularProgressIndicator(color = VelnyxLime)
     }
 }
 
@@ -295,7 +305,7 @@ private fun ErrorState(message: String) {
         Text(
             text = "Couldn't load this run",
             style = MaterialTheme.typography.titleLarge,
-            color = VelnyxBlack,
+            color = VelnyxWhite,
             textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(VelnyxSpacing.sm))

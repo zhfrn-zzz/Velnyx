@@ -26,10 +26,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,10 +46,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxBlack
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray100
-import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray600
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray400
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxLime
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxOffBlack
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxWhite
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -70,7 +74,6 @@ private val clubsJson = Json { ignoreUnknownKeys = true }
 private fun formatMembers(members: Int): String = when {
     members >= 1000 -> {
         val k = members / 1000.0
-        // One decimal place, drop trailing .0
         val rounded = (k * 10).toInt() / 10.0
         if (rounded == rounded.toInt().toDouble()) "${rounded.toInt()}K members"
         else "${"%.1f".format(rounded)}K members"
@@ -113,15 +116,23 @@ fun ClubsScreen(
             TopAppBar(
                 title = { Text("Running Clubs") },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(
+                        onClick = onNavigateBack,
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = VelnyxWhite),
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
                         )
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = VelnyxBlack,
+                    titleContentColor = VelnyxWhite,
+                ),
             )
         },
+        containerColor = VelnyxBlack,
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -146,7 +157,7 @@ private fun ClubCard(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = VelnyxGray100),
+        colors = CardDefaults.cardColors(containerColor = VelnyxOffBlack),
     ) {
         Row(
             modifier = Modifier
@@ -160,11 +171,11 @@ private fun ClubCard(
                     .background(VelnyxLime, RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    text = club.name.firstOrNull()?.uppercase() ?: "•",
-                    fontSize = 28.sp,
-                    color = VelnyxBlack,
-                    style = MaterialTheme.typography.titleLarge,
+                Icon(
+                    imageVector = Icons.Outlined.Groups,
+                    contentDescription = null,
+                    tint = VelnyxBlack,
+                    modifier = Modifier.size(32.dp),
                 )
             }
             Spacer(modifier = Modifier.width(VelnyxSpacing.md))
@@ -172,7 +183,7 @@ private fun ClubCard(
                 Text(
                     text = club.name,
                     style = MaterialTheme.typography.titleLarge,
-                    color = VelnyxBlack,
+                    color = VelnyxWhite,
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 MetaRow(icon = Icons.Outlined.LocationOn, text = club.city)
@@ -194,14 +205,14 @@ private fun MetaRow(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = VelnyxGray600,
+            tint = VelnyxGray400,
             modifier = Modifier.size(14.dp),
         )
         Spacer(modifier = Modifier.width(VelnyxSpacing.xs))
         Text(
             text = text,
             style = MaterialTheme.typography.bodyMedium,
-            color = VelnyxGray600,
+            color = VelnyxGray400,
         )
     }
 }
@@ -224,15 +235,23 @@ private fun ClubDetailScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(
+                        onClick = onNavigateBack,
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = VelnyxWhite),
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
                         )
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = VelnyxBlack,
+                    titleContentColor = VelnyxWhite,
+                ),
             )
         },
+        containerColor = VelnyxBlack,
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -249,11 +268,11 @@ private fun ClubDetailScreen(
                             .background(VelnyxLime, RoundedCornerShape(20.dp)),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Text(
-                            text = club.name.firstOrNull()?.uppercase() ?: "•",
-                            fontSize = 32.sp,
-                            color = VelnyxBlack,
-                            style = MaterialTheme.typography.titleLarge,
+                        Icon(
+                            imageVector = Icons.Outlined.Groups,
+                            contentDescription = null,
+                            tint = VelnyxBlack,
+                            modifier = Modifier.size(36.dp),
                         )
                     }
                     Spacer(modifier = Modifier.width(VelnyxSpacing.md))
@@ -268,26 +287,26 @@ private fun ClubDetailScreen(
                 Text(
                     text = club.description,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = VelnyxBlack,
+                    color = VelnyxGray100,
                 )
             }
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
-                    colors = CardDefaults.cardColors(containerColor = VelnyxGray100),
+                    colors = CardDefaults.cardColors(containerColor = VelnyxOffBlack),
                 ) {
                     Column(modifier = Modifier.padding(VelnyxSpacing.md)) {
                         Text(
                             text = "Schedule",
                             style = MaterialTheme.typography.titleLarge,
-                            color = VelnyxBlack,
+                            color = VelnyxWhite,
                         )
                         Spacer(modifier = Modifier.height(VelnyxSpacing.xs))
                         Text(
                             text = club.schedule,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = VelnyxGray600,
+                            color = VelnyxGray400,
                         )
                     }
                 }
@@ -297,20 +316,21 @@ private fun ClubDetailScreen(
                 Text(
                     text = "Static Posts",
                     style = MaterialTheme.typography.titleLarge,
+                    color = VelnyxWhite,
                 )
             }
             item {
                 StaticPostCard(
                     author = "Rama K.",
                     timeAgo = "2h ago",
-                    body = "Great run this morning! 🏃 5K easy with the squad, perfect cool weather.",
+                    body = "Great run this morning! 5K easy with the squad, perfect cool weather.",
                 )
             }
             item {
                 StaticPostCard(
                     author = "Sari W.",
                     timeAgo = "Yesterday",
-                    body = "PR'd my 10K loop today 🎉 thanks to whoever paced me through km 7-9 — couldn't have hung on without you.",
+                    body = "PR'd my 10K loop today — thanks to whoever paced me through km 7-9.",
                 )
             }
         }
@@ -326,7 +346,7 @@ private fun StaticPostCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = VelnyxGray100),
+        colors = CardDefaults.cardColors(containerColor = VelnyxOffBlack),
     ) {
         Column(modifier = Modifier.padding(VelnyxSpacing.md)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -347,12 +367,12 @@ private fun StaticPostCard(
                     Text(
                         text = author,
                         style = MaterialTheme.typography.labelLarge,
-                        color = VelnyxBlack,
+                        color = VelnyxWhite,
                     )
                     Text(
                         text = timeAgo,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = VelnyxGray600,
+                        color = VelnyxGray400,
                     )
                 }
             }
@@ -360,13 +380,13 @@ private fun StaticPostCard(
             Text(
                 text = body,
                 style = MaterialTheme.typography.bodyLarge,
-                color = VelnyxBlack,
+                color = VelnyxGray100,
             )
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0A0A0A)
 @Composable
 private fun ClubsScreenPreview() {
     VelnyxTheme { ClubsScreen() }

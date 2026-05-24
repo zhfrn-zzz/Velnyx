@@ -4,6 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
@@ -16,8 +21,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VelnyxTheme {
-                val navController = rememberNavController()
-                VelnyxNavHost(navController)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color(0xFF0A0A0A)),
+                ) {
+                    val navController = rememberNavController()
+                    VelnyxNavHost(navController)
+                }
             }
         }
     }

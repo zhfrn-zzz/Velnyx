@@ -18,9 +18,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.DirectionsRun
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -44,13 +47,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import dev.zhafran.velnyx.core.designsystem.component.VelnyxCard
 import dev.zhafran.velnyx.core.designsystem.component.VelnyxPrimaryButton
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxBlack
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray100
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray400
-import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray600
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxLime
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxOffBlack
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxWhite
@@ -79,7 +81,10 @@ fun HistoryListScreen(
             TopAppBar(
                 title = { Text("Activity history") },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(
+                        onClick = onNavigateBack,
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = VelnyxWhite),
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
@@ -87,12 +92,13 @@ fun HistoryListScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
+                    containerColor = VelnyxBlack,
+                    titleContentColor = VelnyxWhite,
                 ),
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = VelnyxBlack,
     ) { padding ->
         PullToRefreshBox(
             isRefreshing = isRefreshing,
@@ -154,7 +160,7 @@ private fun TotalDistanceHero(runs: List<RunSummaryDto>) {
         modifier = Modifier
             .fillMaxWidth()
             .height(140.dp),
-        color = VelnyxBlack,
+        color = VelnyxOffBlack,
         shape = MaterialTheme.shapes.medium,
     ) {
         Column(
@@ -187,11 +193,13 @@ private fun TotalDistanceHero(runs: List<RunSummaryDto>) {
 
 @Composable
 private fun RunHistoryCard(run: RunSummaryDto, onClick: () -> Unit) {
-    VelnyxCard(
-        modifier = Modifier.fillMaxWidth(),
+    Card(
         onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = VelnyxOffBlack),
     ) {
-        Column {
+        Column(modifier = Modifier.padding(VelnyxSpacing.md)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -200,13 +208,13 @@ private fun RunHistoryCard(run: RunSummaryDto, onClick: () -> Unit) {
                 Text(
                     text = formatDate(run.startedAt),
                     style = MaterialTheme.typography.titleLarge,
-                    color = VelnyxBlack,
+                    color = VelnyxWhite,
                 )
                 Text(
                     text = "%.2f km".format(Locale.ENGLISH, run.distanceM / 1000.0),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold,
-                    color = VelnyxBlack,
+                    color = VelnyxLime,
                 )
             }
             Spacer(modifier = Modifier.height(VelnyxSpacing.sm))
@@ -230,12 +238,12 @@ private fun MetricInline(label: String, value: String) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelLarge,
-            color = VelnyxGray600,
+            color = VelnyxGray400,
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyLarge,
-            color = VelnyxBlack,
+            color = VelnyxGray100,
             fontWeight = FontWeight.Medium,
         )
     }
@@ -253,14 +261,13 @@ private fun LoadingState() {
         ),
         verticalArrangement = Arrangement.spacedBy(VelnyxSpacing.sm),
     ) {
-        // 1 hero skeleton + 3 card skeletons.
         item {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(140.dp)
                     .background(
-                        color = VelnyxGray100,
+                        color = VelnyxOffBlack,
                         shape = MaterialTheme.shapes.medium,
                     ),
             )
@@ -271,7 +278,7 @@ private fun LoadingState() {
                     .fillMaxWidth()
                     .height(96.dp)
                     .background(
-                        color = VelnyxGray100,
+                        color = VelnyxOffBlack,
                         shape = MaterialTheme.shapes.medium,
                     ),
             )
@@ -298,7 +305,7 @@ private fun EmptyState() {
         Text(
             text = "No runs yet. Time to move!",
             style = MaterialTheme.typography.titleLarge,
-            color = VelnyxBlack,
+            color = VelnyxWhite,
             textAlign = TextAlign.Center,
         )
     }
@@ -316,14 +323,14 @@ private fun ErrorState(message: String, onRetry: () -> Unit) {
         Text(
             text = "Couldn't load your runs",
             style = MaterialTheme.typography.titleLarge,
-            color = VelnyxBlack,
+            color = VelnyxWhite,
             textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(VelnyxSpacing.sm))
         Text(
             text = message,
             style = MaterialTheme.typography.bodyMedium,
-            color = VelnyxGray600,
+            color = VelnyxGray400,
             textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(VelnyxSpacing.lg))
@@ -371,35 +378,35 @@ internal fun formatPace(secondsPerKm: Int?): String {
 
 // ─── Previews ────────────────────────────────────────────────────────────────
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0A0A0A)
 @Composable
 private fun HistoryListScreenEmptyPreview() {
     VelnyxTheme {
-        Surface { EmptyState() }
+        Surface(color = VelnyxBlack) { EmptyState() }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0A0A0A)
 @Composable
 private fun HistoryListScreenLoadingPreview() {
     VelnyxTheme {
-        Surface { LoadingState() }
+        Surface(color = VelnyxBlack) { LoadingState() }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0A0A0A)
 @Composable
 private fun HistoryListScreenErrorPreview() {
     VelnyxTheme {
-        Surface { ErrorState(message = "Network unreachable", onRetry = {}) }
+        Surface(color = VelnyxBlack) { ErrorState(message = "Network unreachable", onRetry = {}) }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0A0A0A)
 @Composable
 private fun HistoryListSuccessPreview() {
     VelnyxTheme {
-        Surface {
+        Surface(color = VelnyxBlack) {
             SuccessContent(
                 runs = listOf(
                     RunSummaryDto(

@@ -1,12 +1,16 @@
 package dev.zhafran.velnyx.core.navigation
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -24,13 +28,13 @@ import dev.zhafran.velnyx.feature.clubs.presentation.ClubsScreen
 import dev.zhafran.velnyx.feature.history.presentation.HistoryDetailScreen
 import dev.zhafran.velnyx.feature.history.presentation.HistoryListScreen
 import dev.zhafran.velnyx.feature.home.presentation.HomeScreen
-import dev.zhafran.velnyx.feature.home.presentation.InfoDetailScreen
 import dev.zhafran.velnyx.feature.onboarding.presentation.PermissionAutostartScreen
 import dev.zhafran.velnyx.feature.onboarding.presentation.PermissionBackgroundScreen
 import dev.zhafran.velnyx.feature.onboarding.presentation.PermissionBatteryScreen
 import dev.zhafran.velnyx.feature.onboarding.presentation.PermissionLocationScreen
 import dev.zhafran.velnyx.feature.onboarding.presentation.PermissionNotificationsScreen
 import dev.zhafran.velnyx.core.util.PermissionHelper
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxBlack
 import dev.zhafran.velnyx.feature.profile.presentation.SettingsScreen
 import dev.zhafran.velnyx.feature.programs.presentation.ProgramsScreen
 import dev.zhafran.velnyx.feature.runsummary.presentation.RunSummaryScreen
@@ -44,6 +48,7 @@ fun VelnyxNavHost(navController: NavHostController) {
     NavHost(
         navController = navController,
         startDestination = SplashRoute,
+        modifier = Modifier.background(VelnyxBlack),
     ) {
         // ── Auth ─────────────────────────────────────────────────────────────
         composable<SplashRoute> {
@@ -203,17 +208,6 @@ fun VelnyxNavHost(navController: NavHostController) {
                 onNavigateToPrograms = { navController.navigate(ProgramsRoute) },
                 onNavigateToClubs = { navController.navigate(ClubsRoute) },
                 onNavigateToSettings = { navController.navigate(SettingsRoute) },
-                onNavigateToInfoDetail = { articleId ->
-                    navController.navigate(InfoDetailRoute(articleId = articleId))
-                },
-            )
-        }
-
-        composable<InfoDetailRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<InfoDetailRoute>()
-            InfoDetailScreen(
-                articleId = route.articleId,
-                onNavigateBack = { navController.popBackStack() },
             )
         }
 
@@ -251,7 +245,11 @@ fun VelnyxNavHost(navController: NavHostController) {
 
                 when (val s = runState) {
                     is RunState.Countdown -> CountdownScreen(secLeft = s.secLeft)
-                    else -> CountdownScreen(secLeft = 3)
+                    else -> Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(VelnyxBlack),
+                    )
                 }
             }
 

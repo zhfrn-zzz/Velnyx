@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -19,6 +20,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Checkroom
+import androidx.compose.material.icons.outlined.FitnessCenter
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.LocalDrink
+import androidx.compose.material.icons.outlined.SelfImprovement
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -29,6 +35,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -43,6 +50,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -89,6 +97,14 @@ data class RunningInfo(
 
 private val runningInfoJson = Json { ignoreUnknownKeys = true }
 
+private fun categoryIcon(category: String): ImageVector = when (category) {
+    "Technique" -> Icons.Outlined.SelfImprovement
+    "Nutrition" -> Icons.Outlined.LocalDrink
+    "Training" -> Icons.Outlined.FitnessCenter
+    "Gear" -> Icons.Outlined.Checkroom
+    else -> Icons.Outlined.Info
+}
+
 // ── Screen ───────────────────────────────────────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,7 +116,6 @@ fun HomeScreen(
     onNavigateToPrograms: () -> Unit = {},
     onNavigateToClubs: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
-    onNavigateToInfoDetail: (String) -> Unit = {},
     homeViewModel: HomeViewModel = hiltViewModel(),
     historyViewModel: HistoryViewModel = hiltViewModel(),
 ) {
@@ -108,6 +123,7 @@ fun HomeScreen(
     var infos by remember { mutableStateOf<List<RunningInfo>>(emptyList()) }
     val historyState by historyViewModel.runs.collectAsStateWithLifecycle()
     val orphanedRun by homeViewModel.orphanedRun.collectAsStateWithLifecycle()
+    var selectedInfo by remember { mutableStateOf<RunningInfo?>(null) }
 
     LaunchedEffect(Unit) {
         infos = withContext(Dispatchers.IO) {
@@ -146,6 +162,44 @@ fun HomeScreen(
                 }
             },
         )
+    }
+
+    // ── Bottom sheet for Running Information ─────────────────────────────────
+    selectedInfo?.let { info ->
+        ModalBottomSheet(
+            onDismissRequest = { selectedInfo = null },
+            containerColor = VelnyxOffBlack,
+            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        ) {
+            Column(modifier = Modifier.padding(24.dp)) {
+                Box(
+                    modifier = Modifier
+                        .background(VelnyxLime, RoundedCornerShape(percent = 50))
+                        .padding(horizontal = VelnyxSpacing.md, vertical = 4.dp),
+                ) {
+                    Text(
+                        text = info.category,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = VelnyxBlack,
+                    )
+                }
+                Spacer(modifier = Modifier.height(VelnyxSpacing.md))
+                Text(
+                    text = info.title,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = VelnyxWhite,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(modifier = Modifier.height(VelnyxSpacing.md))
+                Text(
+                    text = info.body,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = VelnyxGray100,
+                    lineHeight = 24.sp,
+                )
+                Spacer(Modifier.height(32.dp))
+            }
+        }
     }
 
     Scaffold(
@@ -234,7 +288,7 @@ fun HomeScreen(
                     items(infos, key = { it.id }) { info ->
                         InfoCard(
                             info = info,
-                            onClick = { onNavigateToInfoDetail(info.id) },
+                            onClick = { selectedInfo = info },
                         )
                     }
                 }
@@ -247,11 +301,6 @@ fun HomeScreen(
 
 // ── Buttons ─────────────────────────────────────────────────────────────────
 
-/**
- * Outlined button styled for the dark home surface. Local to HomeScreen so the
- * shared `VelnyxSecondaryButton` (which assumes a light surface) stays untouched
- * and other screens keep their existing appearance.
- */
 @Composable
 private fun DarkOutlinedButton(
     text: String,
@@ -277,7 +326,6 @@ private fun RecentActivitySection(
     onSeeAll: () -> Unit,
     onNavigateToCountdown: () -> Unit,
 ) {
-    // Per spec: silently hide on Error.
     if (state is HistoryUiState.Error) return
 
     Spacer(modifier = Modifier.height(VelnyxSpacing.xl))
@@ -313,7 +361,7 @@ private fun RecentActivitySection(
                 }
             }
         }
-        is HistoryUiState.Error -> Unit // already handled above
+        is HistoryUiState.Error -> Unit
     }
 }
 
@@ -421,10 +469,19 @@ private fun InfoCard(
         colors = CardDefaults.cardColors(containerColor = VelnyxOffBlack),
     ) {
         Column(modifier = Modifier.padding(VelnyxSpacing.md)) {
-            Text(
-                text = info.emoji,
-                fontSize = 32.sp,
-            )
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(VelnyxLime, RoundedCornerShape(percent = 50)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = categoryIcon(info.category),
+                    contentDescription = null,
+                    tint = VelnyxBlack,
+                    modifier = Modifier.size(22.dp),
+                )
+            }
             Spacer(modifier = Modifier.height(VelnyxSpacing.sm))
             Text(
                 text = info.title,

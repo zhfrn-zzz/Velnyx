@@ -19,15 +19,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,10 +45,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxBlack
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray100
-import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray600
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxGray400
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxLime
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxOffBlack
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxSpacing
 import dev.zhafran.velnyx.core.designsystem.theme.VelnyxTheme
+import dev.zhafran.velnyx.core.designsystem.theme.VelnyxWhite
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
@@ -113,15 +118,23 @@ fun ProgramsScreen(
             TopAppBar(
                 title = { Text("Running Programs") },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(
+                        onClick = onNavigateBack,
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = VelnyxWhite),
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
                         )
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = VelnyxBlack,
+                    titleContentColor = VelnyxWhite,
+                ),
             )
         },
+        containerColor = VelnyxBlack,
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -146,7 +159,7 @@ private fun ProgramCard(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = VelnyxGray100),
+        colors = CardDefaults.cardColors(containerColor = VelnyxOffBlack),
     ) {
         Row(
             modifier = Modifier
@@ -160,9 +173,11 @@ private fun ProgramCard(
                     .background(VelnyxLime, RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    text = program.imageEmoji,
-                    fontSize = 36.sp,
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.DirectionsRun,
+                    contentDescription = null,
+                    tint = VelnyxBlack,
+                    modifier = Modifier.size(32.dp),
                 )
             }
             Spacer(modifier = Modifier.width(VelnyxSpacing.md))
@@ -170,13 +185,13 @@ private fun ProgramCard(
                 Text(
                     text = program.title,
                     style = MaterialTheme.typography.titleLarge,
-                    color = VelnyxBlack,
+                    color = VelnyxWhite,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = program.subtitle,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = VelnyxGray600,
+                    color = VelnyxGray400,
                 )
             }
         }
@@ -201,15 +216,23 @@ private fun ProgramDetailScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(
+                        onClick = onNavigateBack,
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = VelnyxWhite),
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
                         )
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = VelnyxBlack,
+                    titleContentColor = VelnyxWhite,
+                ),
             )
         },
+        containerColor = VelnyxBlack,
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -226,9 +249,11 @@ private fun ProgramDetailScreen(
                             .background(VelnyxLime, RoundedCornerShape(20.dp)),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Text(
-                            text = program.imageEmoji,
-                            fontSize = 40.sp,
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.DirectionsRun,
+                            contentDescription = null,
+                            tint = VelnyxBlack,
+                            modifier = Modifier.size(36.dp),
                         )
                     }
                     Spacer(modifier = Modifier.width(VelnyxSpacing.md))
@@ -236,7 +261,7 @@ private fun ProgramDetailScreen(
                         Text(
                             text = program.subtitle,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = VelnyxGray600,
+                            color = VelnyxGray400,
                         )
                     }
                 }
@@ -245,7 +270,7 @@ private fun ProgramDetailScreen(
                 Text(
                     text = program.description,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = VelnyxBlack,
+                    color = VelnyxGray100,
                 )
             }
             item {
@@ -253,9 +278,9 @@ private fun ProgramDetailScreen(
                 Text(
                     text = "Weekly Schedule",
                     style = MaterialTheme.typography.titleLarge,
+                    color = VelnyxWhite,
                 )
             }
-            // Show first week's day-by-day breakdown.
             val firstWeek = program.weeks.firstOrNull()
             if (firstWeek != null) {
                 item {
@@ -266,7 +291,7 @@ private fun ProgramDetailScreen(
                     Text(
                         text = "Schedule coming soon.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = VelnyxGray600,
+                        color = VelnyxGray400,
                     )
                 }
             }
@@ -283,7 +308,7 @@ private fun WeekPills(week: ProgramWeek) {
         Text(
             text = "Week ${week.week}",
             style = MaterialTheme.typography.titleLarge,
-            color = VelnyxBlack,
+            color = VelnyxWhite,
         )
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(VelnyxSpacing.sm),
@@ -300,7 +325,7 @@ private fun DayPill(day: ProgramDay) {
     Card(
         modifier = Modifier.width(120.dp),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = VelnyxGray100),
+        colors = CardDefaults.cardColors(containerColor = VelnyxOffBlack),
     ) {
         Column(
             modifier = Modifier
@@ -323,13 +348,13 @@ private fun DayPill(day: ProgramDay) {
             Text(
                 text = day.workout,
                 style = MaterialTheme.typography.bodyMedium,
-                color = VelnyxBlack,
+                color = VelnyxGray100,
             )
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0A0A0A)
 @Composable
 private fun ProgramsScreenPreview() {
     VelnyxTheme { ProgramsScreen() }

@@ -30,6 +30,7 @@ playServicesLocation = "21.3.0"
 coil = "3.4.0"
 accompanistPermissions = "0.37.3"
 composeGoogleFonts = "1.8.2"
+splashscreen = "1.0.1"
 
 # Testing
 junit = "4.13.2"
@@ -97,6 +98,9 @@ androidx-compose-ui-text-google-fonts = { group = "androidx.compose.ui", name = 
 
 # Permissions
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermissions" }
+
+# Splash Screen
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }

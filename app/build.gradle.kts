@@ -111,6 +111,9 @@ dependencies {
     // Permissions
     implementation(libs.accompanist.permissions)
 
+    // Splash Screen
+    implementation(libs.androidx.core.splashscreen)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -119,4 +122,27 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+android {
+    // ... existing config ...
+    
+    signingConfigs {
+        getByName("debug") {
+            // already exists, no changes needed
+        }
+    }
+    
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            // Add this line — use debug keystore for signing:
+            signingConfig = signingConfigs.getByName("debug")
+        }
+    }
 }

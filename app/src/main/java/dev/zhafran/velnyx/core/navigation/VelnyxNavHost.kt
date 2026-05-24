@@ -195,6 +195,10 @@ fun VelnyxNavHost(navController: NavHostController) {
                 onNavigateToCountdown = {
                     navController.navigate(TrackingGraphRoute)
                 },
+                onResumeOrphanedRun = { runId ->
+                    PendingResumeRun.set(runId)
+                    navController.navigate(TrackingGraphRoute)
+                },
                 onNavigateToHistory = { navController.navigate(HistoryListRoute) },
                 onNavigateToPrograms = { navController.navigate(ProgramsRoute) },
                 onNavigateToClubs = { navController.navigate(ClubsRoute) },
@@ -219,17 +223,28 @@ fun VelnyxNavHost(navController: NavHostController) {
                 val parentEntry = try {
                     navController.getBackStackEntry(TrackingGraphRoute)
                 } catch (e: IllegalArgumentException) {
-                    return@composable // Graph already popped (exit animation), skip
+                    return@composable
                 }
                 val viewModel: ActiveRunViewModel = hiltViewModel(parentEntry)
                 val runState by viewModel.state.collectAsStateWithLifecycle()
+                var isResuming by remember { mutableStateOf(false) }
 
-                LaunchedEffect(Unit) { viewModel.onStartTapped() }
+                LaunchedEffect(Unit) {
+                    val resumeId = PendingResumeRun.consumeIfPresent()
+                    if (resumeId > 0L) {
+                        isResuming = true
+                        navController.navigate(LiveTrackingRoute(resumeRunId = resumeId)) {
+                            popUpTo<CountdownRoute> { inclusive = true }
+                        }
+                    } else {
+                        viewModel.onStartTapped()
+                    }
+                }
 
                 LaunchedEffect(runState) {
-                    if (runState is RunState.Running) {
-                        navController.navigate(LiveTrackingRoute) {
-                            popUpTo(CountdownRoute) { inclusive = true }
+                    if (!isResuming && runState is RunState.Running) {
+                        navController.navigate(LiveTrackingRoute()) {
+                            popUpTo<CountdownRoute> { inclusive = true }
                         }
                     }
                 }
@@ -248,6 +263,14 @@ fun VelnyxNavHost(navController: NavHostController) {
                 }
                 val viewModel: ActiveRunViewModel = hiltViewModel(parentEntry)
                 val runState by viewModel.state.collectAsStateWithLifecycle()
+                val route = backStackEntry.toRoute<LiveTrackingRoute>()
+
+                // If resuming an orphaned run, kick off resume once
+                LaunchedEffect(route.resumeRunId) {
+                    if (route.resumeRunId > 0L) {
+                        viewModel.resumeOrphanedRun(route.resumeRunId)
+                    }
+                }
 
                 BackHandler(enabled = true) { /* no-op — must use finish button */ }
 

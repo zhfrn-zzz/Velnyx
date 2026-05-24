@@ -109,6 +109,22 @@ class ActiveRunViewModel @Inject constructor(
         }
     }
 
+    fun resumeOrphanedRun(orphanRunId: Long) {
+        if (_state.value !is RunState.Idle) return
+        viewModelScope.launch {
+            val entity = repository.getRunById(orphanRunId) ?: return@launch
+            runId = orphanRunId
+            _state.value = if (entity.state == "PAUSED") {
+                RunState.Paused(buildStats(entity))
+            } else {
+                RunState.Running(buildStats(entity))
+            }
+            observeRun(runId)
+            startDisplayTimer(runId)
+            app.startForegroundService(RunTrackingService.startIntent(app, runId))
+        }
+    }
+
     fun onPauseTapped() {
         if (_state.value !is RunState.Running) return
         viewModelScope.launch {

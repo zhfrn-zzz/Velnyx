@@ -125,6 +125,14 @@ class ActiveRunRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun checkForOrphanedRun(): ActiveRunEntity? = dao.getActiveRun()
+
+    override suspend fun deleteAllRunData() {
+        dao.deleteAllActivePoints()
+        dao.deleteAllActiveSegments()
+        dao.deleteAllActiveRuns()
+    }
+
     override fun observeActiveRun(): Flow<ActiveRunEntity?> = dao.observeActiveRun()
 
     override fun observeRunById(runId: Long): Flow<ActiveRunEntity?> = dao.observeRunById(runId)

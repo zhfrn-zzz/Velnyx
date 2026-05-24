@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -70,6 +71,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.util.Locale
 
+private fun formatTimestamp(millis: Long): String {
+    val sdf = java.text.SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
+    return sdf.format(java.util.Date(millis))
+}
+
 // ── Data model ──────────────────────────────────────────────────────────────
 
 @Serializable
@@ -89,16 +95,19 @@ private val runningInfoJson = Json { ignoreUnknownKeys = true }
 @Composable
 fun HomeScreen(
     onNavigateToCountdown: () -> Unit = {},
+    onResumeOrphanedRun: (runId: Long) -> Unit = {},
     onNavigateToHistory: () -> Unit = {},
     onNavigateToPrograms: () -> Unit = {},
     onNavigateToClubs: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
     onNavigateToInfoDetail: (String) -> Unit = {},
+    homeViewModel: HomeViewModel = hiltViewModel(),
     historyViewModel: HistoryViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     var infos by remember { mutableStateOf<List<RunningInfo>>(emptyList()) }
     val historyState by historyViewModel.runs.collectAsStateWithLifecycle()
+    val orphanedRun by homeViewModel.orphanedRun.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         infos = withContext(Dispatchers.IO) {
@@ -108,6 +117,35 @@ fun HomeScreen(
                 }
             }.getOrElse { emptyList() }
         }
+    }
+
+    // ── Orphaned run recovery dialog ────────────────────────────────────────
+    orphanedRun?.let { orphan ->
+        AlertDialog(
+            shape = RoundedCornerShape(16.dp),
+            containerColor = VelnyxOffBlack,
+            titleContentColor = VelnyxWhite,
+            textContentColor = VelnyxGray400,
+            onDismissRequest = { /* force choice */ },
+            title = { Text("Unfinished Run") },
+            text = {
+                Text(
+                    "You have a paused run from ${formatTimestamp(orphan.startedAt)}. " +
+                        "What would you like to do?"
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    homeViewModel.resumeOrphanedRun()
+                    onResumeOrphanedRun(orphan.id)
+                }) { Text("Resume", color = VelnyxLime) }
+            },
+            dismissButton = {
+                TextButton(onClick = { homeViewModel.discardOrphanedRun() }) {
+                    Text("Discard", color = VelnyxGray400)
+                }
+            },
+        )
     }
 
     Scaffold(

@@ -49,7 +49,7 @@ data object TrackingGraphRoute
 data object CountdownRoute
 
 @Serializable
-data object LiveTrackingRoute
+data class LiveTrackingRoute(val resumeRunId: Long = -1L)
 
 @Serializable
 data class RunSummaryRoute(

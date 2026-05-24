@@ -9,6 +9,8 @@ interface ActiveRunRepository {
     suspend fun pause(runId: Long)
     suspend fun resume(runId: Long)
     suspend fun finish(runId: Long): Result<Unit>
+    suspend fun checkForOrphanedRun(): ActiveRunEntity?
+    suspend fun deleteAllRunData()
     fun observeActiveRun(): Flow<ActiveRunEntity?>
     fun observeRunById(runId: Long): Flow<ActiveRunEntity?>
     suspend fun getRunById(runId: Long): ActiveRunEntity?
